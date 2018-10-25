@@ -1,5 +1,4 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
-
 const addNestedPath = require('../../hooks/add-nested-path');
 
 module.exports = {
@@ -8,8 +7,8 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [addNestedPath("#")],
-    update: [addNestedPath("#")],
+    create: [addNestedPath()],
+    update: [addNestedPath()],
     patch: [],
     remove: []
   },

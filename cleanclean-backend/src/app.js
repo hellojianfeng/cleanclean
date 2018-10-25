@@ -20,6 +20,8 @@ const authentication = require('./authentication');
 
 const mongoose = require('./mongoose');
 
+const swagger = require('feathers-swagger');
+
 const app = express(feathers());
 
 // Load app configuration
@@ -43,6 +45,17 @@ app.configure(mongoose);
 // Configure other middleware (see `middleware/index.js`)
 app.configure(middleware);
 app.configure(authentication);
+
+//Config swagger
+app.configure(swagger({
+    docsPath: '/docs',
+    uiIndex: true,
+    info: {
+        title: 'CleanClean API Document',
+        description: 'CleanClean API Document'
+    }
+}));
+
 // Set up our services (see `services/index.js`)
 app.configure(services);
 // Set up event channels (see channels.js)
