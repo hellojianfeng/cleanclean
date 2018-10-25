@@ -13,9 +13,12 @@ module.exports = function (app) {
   });
 
   const orgs = new Schema({
-    name: { type: String, required: true, unique: true },
+    name: { type: String, unique: true },
     display_name: { type: String },
-    type: { type: Schema.Types.ObjectId }, //object id of org-types
+    type: { 
+      oid: { type: Schema.Types.ObjectId },
+      data: { type: Schema.Types.Mixed }
+    }, //object id of org-types
     path: { type: String, unique: true }, // # sperated string, for example, company1#department1#office1, default is same as name
     profiles: [ orgProfile ],
     data: { type: Schema.Types.Mixed }
