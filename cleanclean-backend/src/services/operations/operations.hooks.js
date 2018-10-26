@@ -1,20 +1,14 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
 
-const addNestedPath = require('../../hooks/add-nested-path');
-
-const beforeAddOrg = require('../../hooks/before-add-org');
-
-const afterCreateOrg = require('../../hooks/after-create-org');
-
 module.exports = {
   before: {
     //all: [ authenticate('jwt') ],
     all: [],
     find: [],
     get: [],
-    create: [addNestedPath("#"), beforeAddOrg()],
-    update: [addNestedPath("#"), beforeAddOrg()],
-    patch: [addNestedPath("#"), beforeAddOrg()],
+    create: [],
+    update: [],
+    patch: [],
     remove: []
   },
 
@@ -22,7 +16,7 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [afterCreateOrg()],
+    create: [],
     update: [],
     patch: [],
     remove: []

@@ -5,14 +5,14 @@ module.exports = function (app) {
     const mongooseClient = app.get('mongooseClient');
     const { Schema } = mongooseClient;
     
-    const progressSchema = new Schema({
+    const ProgressSchema = new Schema({
       percentage: Number,
       data: {
         type: Schema.Types.Mixed
       }
     });
 
-    const typeSchema = new Schema({
+    const TypeSchema = new Schema({
         name: { type: String },
         display_name: { type: String },
         path: { type: String }, // dot sperated string, for example, company.softwareCompany, default is same as name
@@ -21,6 +21,6 @@ module.exports = function (app) {
         }
     });
   
-    return { progressSchema, typeSchema }
+    return { ProgressSchema, TypeSchema }
   };
   

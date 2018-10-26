@@ -6,6 +6,7 @@ module.exports = function (options = {}) {
   return async context => {
     const typeService = context.app.service("org-types");
 
+    //add type for org
     if(context.data.type){
 
       let type = {};
@@ -20,7 +21,6 @@ module.exports = function (options = {}) {
       return new Promise(function(resolve, reject){
         if( typeId ){
           return typeService.get(typeId).then(function(oType){
-            console.log('oType', oType);
             context.data.type.oid = oType.id;
             return resolve(context);
           })
@@ -28,10 +28,8 @@ module.exports = function (options = {}) {
 
         if(type.path){
           return typeService.find({query:{path:type.path}}).then(function(oTypes){
-            console.log('oTypes', oTypes);
             if(oTypes && oTypes.total > 0){
               context.data.type.oid = oTypes.data[0]._id;
-              console.log('context.data', context.data);
             }
             return resolve(context);
           })
