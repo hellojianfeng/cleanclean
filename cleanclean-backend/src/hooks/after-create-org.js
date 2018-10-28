@@ -6,29 +6,35 @@ module.exports = function (options = {}) {
   return async context => {
 
     //add admin role
-    const roleService = context.app.service("roles");
-    const userService = context.app.service("users");
-    const adminData = await roleService.create({
-      name: "admin",
+    const roleService = context.app.service('roles');
+    const userService = context.app.service('users');
+
+    //each org have four default roles: everyone, member, admin and public
+    const admin = await roleService.create({
+      name: 'admin',
+      org: context.result._id
+    });
+
+    //console.log('context',context);
+    //console.log('admin',admin);
+
+    const roles = context.params.user.roles || [];
+
+    roles.push({
+      role: {
+        oid: admin._id
+      },
       org: {
-        oid: context.id
+        oid: context.result._id,
+        path: context.result.path
       }
     });
 
     //add current user as admin
-    const user = context.result.userId;
-    await userService.update(context.result.userId,{
-      roles: [
-        {
-          role: {
-            oid: adminData.id
-          },
-          org: {
-            oid: context.id,
-            name: context.data.name
-          }
-        }]
-    });
+    await userService.patch(context.params.user._id, 
+      {
+        roles:roles
+      });
 
     return context;
   };

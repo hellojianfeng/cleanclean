@@ -13,7 +13,7 @@ module.exports = function (app) {
   });
 
   const orgs = new Schema({
-    name: { type: String, unique: true },
+    name: { type: String },
     display_name: { type: String },
     type: { 
       oid: { type: Schema.Types.ObjectId },

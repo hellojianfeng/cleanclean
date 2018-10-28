@@ -5,7 +5,7 @@
 module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const { Schema } = mongooseClient;
-  const { ProgressSchema } = require("./schemas")(app);
+  const { ProgressSchema } = require('./schemas')(app);
   const operationStage = new Schema({
     name: { type: String }, //for example, ready, start, end, ....
     display_name: { type: String },
@@ -37,14 +37,8 @@ module.exports = function (app) {
     path: { type: String, required: true },//dot seperate name of operation, unique in app
     display_name: { type: String },
     data: { type: Schema.Types.Mixed },
-    app: { 
-      oid: { type: Schema.Types.ObjectId, required: true },
-      data: { type: Schema.Types.Mixed } 
-     },
-    org: { 
-      oid: { type: Schema.Types.ObjectId, required: true  },
-      data: { type: Schema.Types.Mixed  }
-    },
+    app: { type: String, default: 'default' },
+    org: { type: Schema.Types.ObjectId, required: true  },
     roles: [ operationRole ],
     stage: {
       definitions: [ operationStage ],
@@ -60,6 +54,8 @@ module.exports = function (app) {
   }, {
     timestamps: true
   });
+
+  operations.index({ path: 1, org: 1, app: 1 },  { unique: true });
 
   return mongooseClient.model('operations', operations);
 };

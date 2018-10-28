@@ -8,13 +8,12 @@ const afterCreateOrg = require('../../hooks/after-create-org');
 
 module.exports = {
   before: {
-    //all: [ authenticate('jwt') ],
-    all: [],
+    all: [ authenticate('jwt') ],
     find: [],
     get: [],
-    create: [addNestedPath("#"), beforeAddOrg()],
-    update: [addNestedPath("#"), beforeAddOrg()],
-    patch: [addNestedPath("#"), beforeAddOrg()],
+    create: [addNestedPath('#'), beforeAddOrg()],
+    update: [addNestedPath('#'), beforeAddOrg()],
+    patch: [addNestedPath('#'), beforeAddOrg()],
     remove: []
   },
 

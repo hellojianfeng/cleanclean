@@ -12,7 +12,7 @@ module.exports = function (app) {
       },
       org: { 
         oid: { type: Schema.Types.ObjectId },
-        name: { type: String }
+        path: { type: String }
       },
       data: {type: Schema.Types.Mixed}
     }

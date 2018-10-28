@@ -4,7 +4,7 @@
 // eslint-disable-next-line no-unused-vars
 module.exports = function (options = {}) {
   return async context => {
-    const typeService = context.app.service("org-types");
+    const typeService = context.app.service('org-types');
 
     //add type for org
     if(context.data.type){
@@ -18,12 +18,14 @@ module.exports = function (options = {}) {
 
       const typeId = type._id || type.id || type.oid;
 
-      return new Promise(function(resolve, reject){
+      return new Promise(function(resolve){
         if( typeId ){
           return typeService.get(typeId).then(function(oType){
-            context.data.type.oid = oType.id;
+            if(oType && oType.id){
+              context.data.type.oid = oType.id;
+            }
             return resolve(context);
-          })
+          });
         }
 
         if(type.path){
@@ -32,9 +34,9 @@ module.exports = function (options = {}) {
               context.data.type.oid = oTypes.data[0]._id;
             }
             return resolve(context);
-          })
+          });
         }
-      })
+      });
     }
     return context;
   };
