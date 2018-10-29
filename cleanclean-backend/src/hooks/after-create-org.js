@@ -8,6 +8,7 @@ module.exports = function (options = {}) {
     //add admin role
     const roleService = context.app.service('roles');
     const userService = context.app.service('users');
+    const operationService = context.app.service('operations');
 
     //each org have four default roles: everyone, member, admin and public
     const admin = await roleService.create({
@@ -30,11 +31,22 @@ module.exports = function (options = {}) {
       }
     });
 
-    //add current user as admin
-    await userService.patch(context.params.user._id, 
-      {
-        roles:roles
-      });
+    //add current user as admin and set current org for user
+    await userService.patch(context.params.user._id, {
+      roles:roles,
+      current_org: context.result._id
+    });
+
+    //add default initialize operation for org
+    await operationService.create({
+      name: "org-initialize",
+      org: context.result._id,
+      roles: [
+        {
+          oid: admin._id
+        }
+      ]
+    });
 
     return context;
   };

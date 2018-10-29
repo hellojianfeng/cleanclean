@@ -1,14 +1,14 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
+const addNestedPath = require('../../hooks/add-nested-path');
 
 module.exports = {
   before: {
-    //all: [ authenticate('jwt') ],
-    all: [],
+    all: [ authenticate('jwt') ],
     find: [],
     get: [],
-    create: [],
-    update: [],
-    patch: [],
+    create: [addNestedPath()],
+    update: [addNestedPath()],
+    patch: [addNestedPath()],
     remove: []
   },
 

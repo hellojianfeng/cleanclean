@@ -1,4 +1,5 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
+const afterCreateRunOperation = require('../../hooks/after-create-run-operation');
 
 module.exports = {
   before: {
@@ -15,7 +16,7 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [afterCreateRunOperation()],
     update: [],
     patch: [],
     remove: []

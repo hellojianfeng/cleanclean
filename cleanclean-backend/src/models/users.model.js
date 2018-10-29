@@ -34,6 +34,7 @@ module.exports = function (app) {
     },
     password: { type: String },
     roles: [ userRoleSchema ],
+    current_org: { type: Schema.Types.ObjectId },
     data: {type: Schema.Types.Mixed}
   }, {
     timestamps: true

@@ -9,25 +9,28 @@ module.exports = function (app) {
   const operationStage = new Schema({
     name: { type: String }, //for example, ready, start, end, ....
     display_name: { type: String },
+    seq: { type: Number }, //seq no of stage,
     start: { type: Schema.Types.Mixed }, //usually it is a expression for start
     end: { type: Schema.Types.Mixed },//usually it is a expression for start
     expire: { type: Schema.Types.Mixed },//usually it is a expression for start
     data: { type: Schema.Types.Mixed }
   });
 
+  /** operation role define role to allow run operation, children(parent) means children(parent) 
+   * role can also run operation, if specify recursive as true, means recursive children(parent) is 
+   * allowed to run operation, if not specify recursive, means recursive is false 
+   * if want to exclude one or its children(parent) from all children(parent), exclude property is 
+   * used for that purpose
+   */
   const operationRole = new Schema({
     oid: { type: Schema.Types.ObjectId },
     include: {
-      roles: [ { type: String } ],//array of role path
-      recursive_roles: [ { type: String } ],//array of role path
-      children: { type: String, enum: ['recursive','true','false'] },
-      parent: { type: String, enum: ['recursive','true','false'] },
+      children: { recursive: Boolean },
+      parent: { recursive: Boolean },
     },
     exclude: {
-      roles: [ { type: String } ],//array of role path
-      recursive_roles: [ { type: String } ],//array of role path
-      children: { type: String, enum: ['recursive','true','false'] },
-      parent: { type: String, enum: ['recursive','true','false'] },
+      children: [{ path: { type: String }, recursive: { type: Boolean } }],
+      parent: [{ path: { type: String }, recursive: { type: Boolean } }],
     },
     data: { type: Schema.Types.Mixed }
   });
@@ -40,13 +43,7 @@ module.exports = function (app) {
     app: { type: String, default: 'default' },
     org: { type: Schema.Types.ObjectId, required: true  },
     roles: [ operationRole ],
-    stage: {
-      definitions: [ operationStage ],
-      current: {
-        name: { type: String },
-        progress: { ProgressSchema }
-      }
-    },
+    stages: [ operationStage ],
     concurrent: { 
       allow: { type: Number },
       current: { type: Number }

@@ -4,8 +4,7 @@ const addNestedPath = require('../../hooks/add-nested-path');
 
 module.exports = {
   before: {
-    //all: [ authenticate('jwt') ],
-    all: [],
+    all: [ authenticate('jwt') ],
     find: [],
     get: [],
     create: [addNestedPath()],

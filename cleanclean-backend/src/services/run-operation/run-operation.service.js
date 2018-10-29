@@ -1,7 +1,7 @@
-// Initializes the `operation-process` service on path `/operation-process`
+// Initializes the `run-operation` service on path `/run-operation`
 const createService = require('feathers-mongoose');
-const createModel = require('../../models/operation-process.model');
-const hooks = require('./operation-process.hooks');
+const createModel = require('../../models/run-operation.model');
+const hooks = require('./run-operation.hooks');
 
 module.exports = function (app) {
   const Model = createModel(app);
@@ -13,10 +13,10 @@ module.exports = function (app) {
   };
 
   // Initialize our service with any options it requires
-  app.use('/operation-process', createService(options));
+  app.use('/run-operation', createService(options));
 
   // Get our initialized service so that we can register hooks
-  const service = app.service('operation-process');
+  const service = app.service('run-operation');
 
   service.hooks(hooks);
 };
