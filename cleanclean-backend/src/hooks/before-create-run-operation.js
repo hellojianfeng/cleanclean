@@ -25,18 +25,27 @@ module.exports = function (options = {}) {
     }
 
     await operationService.find({
-      path: operationPath,
-      org: orgId,
-      app: appName
+      query: {
+        path: operationPath,
+        org: orgId.toString(),
+        app: appName
+      }
     }).then ( results => {
       if (results.total < 1){
-        throw new Error('fail to find operation!, operation path = '+operationPath);
+        throw new Error('fail to find operation!, operation = '+operationPath);
       }
       if (results.total > 1){
-        throw new Error('find too many operations, operation path = '+operationPath);
+        throw new Error('find too many operations, operation = '+operationPath);
       }
 
       const operation = results.data[0];
+
+      context.data.operation = {
+        oid: operation._id
+      }
+      context.data.user = {
+        oid: user._id
+      }
 
       let isAllowOperation = false;
 
@@ -51,7 +60,7 @@ module.exports = function (options = {}) {
       });
 
       if(isAllowOperation === false){
-        throw new Error('user is not allowed to run operation! operation path = '+operationPath);
+        throw new Error('user is not allowed to run operation! operation = '+operationPath);
       }
 
       if(operation.path.toLowerCase() === 'org-initialize'){

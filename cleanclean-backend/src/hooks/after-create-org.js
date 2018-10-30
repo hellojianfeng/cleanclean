@@ -10,43 +10,51 @@ module.exports = function (options = {}) {
     const userService = context.app.service('users');
     const operationService = context.app.service('operations');
 
-    //each org have four default roles: everyone, member, admin and public
-    const admin = await roleService.create({
-      name: 'admin',
-      org: context.result._id
-    });
+    let orgs = [];
 
-    //console.log('context',context);
-    //console.log('admin',admin);
+    if(Array.isArray(context.result)){
+      orgs = context.result
+    } else {
+      orgs.push(context.result);
+    }
 
     const roles = context.params.user.roles || [];
 
-    roles.push({
-      role: {
-        oid: admin._id
-      },
-      org: {
-        oid: context.result._id,
-        path: context.result.path
-      }
-    });
+    await Promise.all(orgs.map( async o => {
+      //each org admin role
+      const admin = await roleService.create({
+        name: 'admin',
+        org: o._id
+      });
 
-    //add current user as admin and set current org for user
-    await userService.patch(context.params.user._id, {
-      roles:roles,
-      current_org: context.result._id
-    });
-
-    //add default initialize operation for org
-    await operationService.create({
-      name: "org-initialize",
-      org: context.result._id,
-      roles: [
-        {
+      //add admin to user
+      roles.push({
+        role: {
           oid: admin._id
+        },
+        org: {
+          oid: o._id,
+          path: o.path
         }
-      ]
-    });
+      });
+
+      //add current user as admin and set current org for user
+      await userService.patch(context.params.user._id, {
+        roles:roles,
+        current_org: o._id
+      });
+
+      //add default initialize operation for org
+      await operationService.create({
+        name: "org-initialize",
+        org: o._id,
+        roles: [
+          {
+            oid: admin._id
+          }
+        ]
+      });
+    }))
 
     return context;
   };

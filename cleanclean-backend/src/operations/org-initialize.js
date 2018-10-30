@@ -40,7 +40,15 @@ const orgInitialize = async function (context, operation) {
       await operationService.create(operations);
     }
 
-    //add departments
+    //add sub-orgs
+    if(runData.orgs && Array.isArray(runData.orgs)){
+      const orgs = runData.orgs.map( o => {
+        o.path = o.path ? org.path + "#" + o.path: org.path + "#"+ o.name;
+        return o;
+      });
+
+      await orgService.create(orgs, context.params);
+    }
 
     return context;
 };

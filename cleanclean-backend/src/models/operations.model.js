@@ -39,6 +39,8 @@ module.exports = function (app) {
     name: { type: String, required: true },
     path: { type: String, required: true },//dot seperate name of operation, unique in app
     display_name: { type: String },
+    description: { type: String },
+    tags: { type: String },
     data: { type: Schema.Types.Mixed },
     app: { type: String, default: 'default' },
     org: { type: Schema.Types.ObjectId, required: true  },

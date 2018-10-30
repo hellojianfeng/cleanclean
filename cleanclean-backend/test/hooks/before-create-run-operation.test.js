@@ -1,8 +1,8 @@
 const assert = require('assert');
 const feathers = require('@feathersjs/feathers');
-const afterCreateOperationProcess = require('../../src/hooks/after-create-run-operation');
+const beforeCreateRunOperation = require('../../src/hooks/before-create-run-operation');
 
-describe('\'after-create-operation-process\' hook', () => {
+describe('\'before-create-run-operation\' hook', () => {
   let app;
 
   beforeEach(() => {
@@ -15,7 +15,7 @@ describe('\'after-create-operation-process\' hook', () => {
     });
 
     app.service('dummy').hooks({
-      after: afterCreateOperationProcess()
+      after: beforeCreateRunOperation()
     });
   });
 
