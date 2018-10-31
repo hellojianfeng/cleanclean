@@ -8,15 +8,9 @@ const orgInitialize = async function (context, operation) {
 
     const orgId = user.current_org;
 
-    const org = await orgService.get(orgId);
+    const org = operation.org;
 
-    const processData = context.data.data;
-    const orgData = org.data;
-    const operationData = operation.data;
-
-    let runData = {}
-
-    Object.assign(runData, orgData, operationData, processData);
+    const runData = operation.data;
 
     //add org profiles
 

@@ -1,17 +1,28 @@
 
-const orgInitialize = require('../operations/org-initialize');
+const orgInitialize = require('../operations/js/default/org-initialize');
+const fileTool = require("../utils/file.js");
 
 // eslint-disable-next-line no-unused-vars
 module.exports = function (options = {}) {
   return async context => {
 
     const operationService = context.app.service('operations');
+    const orgService = context.app.service('orgs');
+    const orgTypeService = context.app.service('org-types');
     const user = context.params.user;
 
     //get operation first
     const operationPath = context.data.operation;
     const orgId = user.current_org;
+    const org = await orgService.get(orgId);
     let appName = 'default';
+
+    let orgType = null;
+
+    if(org.type){
+      orgType = await orgTypeService.get(org.type);
+    }
+
     if(context.data.app){
       appName = context.data.app;
     }
@@ -62,6 +73,34 @@ module.exports = function (options = {}) {
       if(isAllowOperation === false){
         throw new Error('user is not allowed to run operation! operation = '+operationPath);
       }
+
+      const processData = context.data.data || {};
+      const orgData = org.data || {};
+      const operationData = operation.data || {};
+
+      const typePath = orgType ? orgType.path : 'company';
+
+      let orgTypeJsonData = {};
+      let orgJsonData = {};
+
+      const orgTypeJsonDataPath = fileTool.getTailFileInDotFolder('src/operations/data/org-types/'+ typePath, 'org-initialize.json');
+      
+      if(orgTypeJsonDataPath){
+        orgTypeJsonData = require(orgTypeJsonDataPath.replace(/^src/,'..'));
+      }
+
+      const orgJsonDataPath = fileTool.getTailFileInDotFolder('src/operations/data/orgs/'+ org.path, 'org-initialize.json',"#");
+      
+      if(orgJsonDataPath){
+        orgJsonData = require(orgJsonDataPath.replace(/^src/,'..'));
+      }
+
+      let runData = {}
+
+      Object.assign(runData, orgData, operationData, orgTypeJsonData.data, orgJsonData, processData);
+
+      operation.data = runData;
+      operation.org = org;
 
       if(operation.path.toLowerCase() === 'org-initialize'){
         context = orgInitialize(context, operation);
