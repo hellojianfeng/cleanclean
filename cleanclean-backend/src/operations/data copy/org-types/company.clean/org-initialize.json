@@ -1,0 +1,207 @@
+{
+    "operation":"org-initialize",
+    "app":"default",
+	"data":{
+		"roles": [
+			{
+				"name":"member",
+				"description":"all users in org exclude public"
+			},
+			{
+				"name":"everyone",
+				"description":"everyone in org"
+			},
+			{
+				"name":"public",
+				"description":"public users in org"
+			}
+		],
+		"operations":[
+			{
+				"name":"org-find",
+				"description":"use to find any org",
+				"roles":[
+					{
+						"path":"everyone"
+					}
+				]
+			},
+			{
+				"name":"org-get",
+				"description":"get org information, parameter can be objectId or org path",
+				"roles":[
+					{
+						"path":"everyone"
+					}
+				]
+			},
+			{
+				"name":"org-update",
+				"description":"update org information, same parameters to api of orgs/patch",
+				"roles":[
+					{
+						"path":"admin"
+					}
+				]
+			},
+			{
+				"name":"role-find",
+				"description":"find roles in org, if not specify org, use current org",
+				"roles":[
+					{
+						"path":"everyone"
+					}
+				]
+			},
+			{
+				"name":"role-create",
+				"description":"create role in org, , if not specify org, use current org",
+				"roles":[
+					{
+						"path":"admin"
+					}
+				]
+			},
+			{
+				"name":"role-update",
+				"description":"update role in org, if not specify org, use current org",
+				"roles":[
+					{
+						"path":"admin"
+					}
+				]
+			},
+			{
+				"name":"role-delete",
+				"description":"delete role in org, can delete only when no user relate to role or no operation relate to role ",
+				"roles":[
+					{
+						"path":"admin"
+					}
+				]
+			},
+			{
+				"name":"operation-find",
+				"description":"find operations, if not provide any params, find current org operations, can also use to find operations for role and find operation for user",
+				"roles":[
+					{
+						"path":"everyone"
+					}
+				]
+			},
+			{
+				"name":"operation-create",
+				"description":"create operation in org, if not specify org, use current org",
+				"roles":[
+					{
+						"path":"admin"
+					}
+				]
+			},
+			{
+				"name":"operation-update",
+				"description":"update operation in org, if not specify org, use current org",
+				"roles":[
+					{
+						"path":"admin"
+					}
+				]
+			},
+			{
+				"name":"operation-delete",
+				"description":"delete operation in org, if not specify org, use current org",
+				"roles":[
+					{
+						"path":"admin"
+					}
+				]
+			},
+			{
+				"name":"operation-data-get",
+				"description":"should provide operation name to get operation data",
+				"roles":[
+					{
+						"path":"admin"
+					}
+				]
+			},
+			{
+				"name":"user-update",
+				"description":"update user's information",
+				"roles":[
+					{
+						"path":"everyone"
+					}
+				]
+			},
+			{
+				"name":"user-org-find",
+				"description":"find user's orgs, user has role(s) related to org",
+				"roles":[
+					{
+						"path":"everyone"
+					}
+				]
+			},
+			{
+				"name":"user-role-find",
+				"description":"find user's roles in org (current or specified)",
+				"roles":[
+					{
+						"path":"everyone"
+					}
+				]
+			},
+			{
+				"name":"user-role-create",
+				"description":"user can create role for self",
+				"roles":[
+					{
+						"path":"everyone"
+					}
+				]
+			},
+			{
+				"name":"user-role-update",
+				"description":"user can update role for self",
+				"roles":[
+					{
+						"path":"everyone"
+					}
+				]
+			},
+			{
+				"name":"user-role-delete",
+				"description":"user can delete role for self",
+				"roles":[
+					{
+						"path":"everyone"
+					}
+				]
+			},
+			{
+				"name":"user-operation-find",
+				"description":"find user's operations in org (current or specified)",
+				"roles":[
+					{
+						"path":"everyone"
+					}
+				]
+			}
+		],
+		"orgs":[
+			{
+				"name":"finance",
+				"type":"department.finance"
+			},
+			{
+				"name":"hr",
+				"type":"department.hr"
+			},
+			{
+				"name":"service",
+				"type":"department.service"
+			}
+		]
+	}
+}
