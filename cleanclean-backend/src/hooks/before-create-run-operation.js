@@ -1,5 +1,6 @@
 
 const orgInitialize = require('../operations/js/default/org-initialize');
+const operationDataGet = require('../operations/js/default/operation-data-get');
 const fileTool = require("../utils/file.js");
 
 // eslint-disable-next-line no-unused-vars
@@ -103,7 +104,11 @@ module.exports = function (options = {}) {
       operation.org = org;
 
       if(operation.path.toLowerCase() === 'org-initialize'){
-        context = orgInitialize(context, operation);
+        await context = orgInitialize(context, operation);
+      }
+
+      if(operation.path.toLowerCase() === 'operation-data-get'){
+        context = operationDataGet(context, operation);
       }
       
     })
