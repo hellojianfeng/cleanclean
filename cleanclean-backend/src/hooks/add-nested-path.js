@@ -16,12 +16,13 @@ module.exports = function (seprator = '.') {
       context.data = items.map( o => {
         if(!o.path){
           o.path = o.name;
-        } else {
-          const lastName = o.path.split(seprator).pop();
-          if (lastName !== o.name){
-            o.path = o.path.replace(lastName,o.name);
-          }
         }
+        // else {
+        //   const lastName = o.path.split(seprator).pop();
+        //   if (lastName !== o.name){
+        //     o.path = o.path.replace(lastName,o.name);
+        //   }
+        // }
         return o;
       });
     } else {

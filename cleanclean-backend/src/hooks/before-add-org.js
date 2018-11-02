@@ -12,7 +12,10 @@ module.exports = function (options = {}) {
       let type = {};
 
       if(typeof context.data.type === 'string'){
-        type = { path: context.data.type };
+        const path = context.data.type;
+        type = { 
+          path: path 
+        };
         context.data.type = {};
       }
 
@@ -32,8 +35,14 @@ module.exports = function (options = {}) {
           return typeService.find({query:{path:type.path}}).then(function(oTypes){
             if(oTypes && oTypes.total > 0){
               context.data.type.oid = oTypes.data[0]._id;
+              return resolve(context);
+            } else {
+              type.name = type.path.slice(type.path.lastIndexOf('.')+1);
+              return typeService.create(type).then( o => {
+                context.data.type.oid = o._id;
+                return resolve(context);
+              })
             }
-            return resolve(context);
           });
         }
       });

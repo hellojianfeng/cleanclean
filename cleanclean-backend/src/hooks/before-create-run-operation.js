@@ -20,7 +20,7 @@ module.exports = function (options = {}) {
     let orgType = null;
 
     if(org.type){
-      orgType = await orgTypeService.get(org.type);
+      orgType = await orgTypeService.get(org.type.oid);
     }
 
     if(context.data.app){
