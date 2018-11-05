@@ -7,12 +7,12 @@ const {
 module.exports = {
   before: {
     all: [],
-    find: [ authenticate('jwt') ],
-    get: [ authenticate('jwt') ],
+    find: [ authenticate('jwt')],
+    get: [ authenticate('jwt')],
     create: [ hashPassword() ],
-    update: [ hashPassword(),  authenticate('jwt') ],
-    patch: [ hashPassword(),  authenticate('jwt') ],
-    remove: [ authenticate('jwt') ]
+    update: [ hashPassword(),  authenticate('jwt') , checkApiPermission()],
+    patch: [ hashPassword(),  authenticate('jwt') , checkApiPermission()],
+    remove: [ authenticate('jwt') , checkApiPermission()]
   },
 
   after: {

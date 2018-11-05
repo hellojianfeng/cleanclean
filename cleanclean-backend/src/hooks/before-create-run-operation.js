@@ -104,7 +104,7 @@ module.exports = function (options = {}) {
       operation.org = org;
 
       if(operation.path.toLowerCase() === 'org-initialize'){
-        await context = orgInitialize(context, operation);
+        context = orgInitialize(context, operation);
       }
 
       if(operation.path.toLowerCase() === 'operation-data-get'){

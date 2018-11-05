@@ -1,28 +1,22 @@
-// roles-model.js - A mongoose model
+// permissions-model.js - A mongoose model
 // 
 // See http://mongoosejs.com/docs/models.html
 // for more of what you can do here.
 module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const { Schema } = mongooseClient;
-  const permissionSchema = new Schema({
-    oid: { type: Schema.Types.ObjectId },
-    path: { type: String }, // dot sperated string, for example, company1#department1#office1, default is same as name
-    data: { type: Schema.Types.Mixed }
-  });
-  const roles = new Schema({
+  const permissions = new Schema({
     name: { type: String },
     display_name: { type: String },
     description: { type: String },
     path: { type: String }, // dot sperated string, for example, company1#department1#office1, default is same as name
     org: { type: Schema.Types.ObjectId, required: true  },
-    permissions: [ permissionSchema ],
     data: { type: Schema.Types.Mixed }
   }, {
     timestamps: true
   });
 
-  roles.index({ path: 1, org: 1 },  { unique: true });
+  permissions.index({ path: 1, org: 1 },  { unique: true });
 
-  return mongooseClient.model('roles', roles);
+  return mongooseClient.model('permissions', permissions);
 };

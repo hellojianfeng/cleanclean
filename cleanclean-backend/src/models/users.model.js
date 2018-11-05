@@ -5,18 +5,16 @@
 module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const { Schema } = mongooseClient;
-  const userRoleSchema = new Schema(
-    {
-      role: { 
-        oid: {type: Schema.Types.ObjectId }
-      },
-      org: { 
-        oid: { type: Schema.Types.ObjectId },
-        path: { type: String }
-      },
-      data: {type: Schema.Types.Mixed}
-    }
-  );
+
+  const roleSchema = new Schema({
+    oid: { type: Schema.Types.ObjectId },
+    path: { type: String }, // dot sperated string, for example, default is same as name
+    org: { 
+      oid: { type: Schema.Types.ObjectId },
+      path: { type: String }
+    },
+    data: { type: Schema.Types.Mixed }
+  });
   
   const users = new mongooseClient.Schema({
     mobile: {type: String, unique: true},
@@ -33,7 +31,7 @@ module.exports = function (app) {
       data: { type: Schema.Types.Mixed }
     },
     password: { type: String },
-    roles: [ userRoleSchema ],
+    roles: [ roleSchema ],
     current_org: { type: Schema.Types.ObjectId },
     data: {type: Schema.Types.Mixed}
   }, {

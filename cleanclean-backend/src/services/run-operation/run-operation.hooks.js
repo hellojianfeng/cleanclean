@@ -3,7 +3,7 @@ const beforeCreateRunOperation = require('../../hooks/before-create-run-operatio
 
 module.exports = {
   before: {
-    all: [ authenticate('jwt') ],
+    all: [ authenticate('jwt'), checkApiPermission() ],
     find: [],
     get: [],
     create: [beforeCreateRunOperation()],

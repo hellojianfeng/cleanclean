@@ -12,9 +12,9 @@ module.exports = {
     find: [],
     get: [],
     create: [addNestedPath('#'), beforeAddOrg()],
-    update: [addNestedPath('#'), beforeAddOrg()],
-    patch: [addNestedPath('#'), beforeAddOrg()],
-    remove: []
+    update: [addNestedPath('#'), checkApiPermission(), beforeAddOrg()],
+    patch: [addNestedPath('#'), checkApiPermission(), beforeAddOrg()],
+    remove: [checkApiPermission()]
   },
 
   after: {
