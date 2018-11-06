@@ -2,6 +2,8 @@ const { authenticate } = require('@feathersjs/authentication').hooks;
 
 const beforeCreateRunApi = require('../../hooks/before-create-run-api');
 
+const checkApiPermission = require('../../hooks/check-api-permission');
+
 module.exports = {
   before: {
     all: [ authenticate('jwt'), checkApiPermission() ],

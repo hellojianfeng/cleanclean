@@ -1,7 +1,7 @@
 
 const orgInitialize = require('../operations/js/default/org-initialize');
 const operationDataGet = require('../operations/js/default/operation-data-get');
-const fileTool = require("../utils/file.js");
+const fileTool = require('../utils/file.js');
 
 // eslint-disable-next-line no-unused-vars
 module.exports = function (options = {}) {
@@ -54,10 +54,10 @@ module.exports = function (options = {}) {
 
       context.data.operation = {
         oid: operation._id
-      }
+      };
       context.data.user = {
         oid: user._id
-      }
+      };
 
       let isAllowOperation = false;
 
@@ -90,13 +90,13 @@ module.exports = function (options = {}) {
         orgTypeJsonData = require(orgTypeJsonDataPath.replace(/^src/,'..'));
       }
 
-      const orgJsonDataPath = fileTool.getTailFileInDotFolder('src/operations/data/orgs/'+ org.path, 'org-initialize.json',"#");
+      const orgJsonDataPath = fileTool.getTailFileInDotFolder('src/operations/data/orgs/'+ org.path, 'org-initialize.json','#');
       
       if(orgJsonDataPath){
         orgJsonData = require(orgJsonDataPath.replace(/^src/,'..'));
       }
 
-      let runData = {}
+      let runData = {};
 
       Object.assign(runData, orgData, operationData, orgTypeJsonData.data, orgJsonData, processData);
 
@@ -111,7 +111,7 @@ module.exports = function (options = {}) {
         context = operationDataGet(context, operation);
       }
       
-    })
+    });
 
     return context;
   };

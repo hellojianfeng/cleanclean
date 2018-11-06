@@ -6,79 +6,23 @@ module.exports = function (options = {}) {
   return async context => {
     const user = context.params.user;
 
-    if(!user){
-      throw new Error('user must be authenticated first!');
-    }
-
-    const service = context.service;
+    const path = context.path;
     const method = context.method;
 
-    if(!user.current_org){
-      throw new Error('current org is not found!');
-    }
-    const current_org = user.current_org;
+    const checkOrg1 = ['orgs','roles','operations','permissions'].includes(path) && ['update','patch','remove'].includes(method);
 
-    const allowPermissions = [];
+    const checkOrg2 = ['run-operation'].includes(path) && ['create','update','patch','remove'].includes(method);
 
-    const jsonApiPermissions = require('../APIs/data/api-permission.json');
-
-    if(jsonApiPermissions[service.name + '-' + method]){
-      allowPermissions = jsonApiPermissions[service.name + '-' + method];
-    }
-
-    if(allowPermissions.length === 0 || allowPermissions.includes['everyone']){
-      return context;
-    }
-
-    let isRoleChecked = false;
-
-    //user can modify own data
-    if(service.name === 'users'){
-      if(context.id && context.id.equal(user._id)){
-        isRoleChecked = true;
+    if(checkOrg1 || checkOrg2){
+      if(!user){
+        throw new Error('user must be authenticated first!');
       }
-    } else {
-      //by default, only allow administrators to access below api method
-      if(['create','update','patch','remove'].includes(method)){
-        if(allowPermissions.indexOf('administrators') !== -1){
-          allowPermissions.push('administrators');
-        }
+      if(!user.current_org){
+        throw new Error('current org is not found!');
       }
-
-      allowPermissions = await allowPermissions.map( async o => {
-        await permissionService.find({
-          query: {
-            org: current_org,
-            path: o
-          }
-        }).then(results => {
-          if(results.total === 0){
-            return results.data[0];
-          }
-        })
-      })
-
-      const roleService = context.app.service('roles');
-      const userRoles = await user.roles.map( async o => {
-        if(o.org.oid.equal(current_org)){
-          return await roleService.get(o._id);
-        }
-      });
-
-      const permissionService = context.app.service('permissions');
-      await userRoles.map( async o => {
-        o.permissions.map( p => {
-          allowPermissions.map( ap => {
-            if(ap._id.equal(p)){
-              isRoleChecked = true;
-            }
-          })
-        })
-      })
-    } 
-
-    if(!isRoleChecked){
-      throw new Error('api is not allow to access by permission!');
+      if(!context.data.org.equal(user.current_org)){
+        throw new Error('user is not allowed to execute api from different org!');
+      }
     }
 
     return context;

@@ -2,10 +2,11 @@
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 
 // eslint-disable-next-line no-unused-vars
+const userOrgFind = require('../APIs/js/user-org-find');
 module.exports = function (options = {}) {
   return async context => {
 
-    const fileTool = require("../utils/file.js");
+    const fileTool = require('../utils/file.js');
 
     const user = context.params.user;
 
@@ -31,7 +32,7 @@ module.exports = function (options = {}) {
 
     const jsonOrgPermissions = fileTool.getTailFileInDotFolder('src/APIs/data/orgs/'+ org.path, 'api-permission.json');
   
-    const jsonApiPermissions = require('');
+    const jsonApiPermissions = require('../APIs/data/api-permission.json');
 
     const jsonPermissions = Object.assign(jsonApiPermissions,jsonTypePermissions,jsonOrgPermissions);
 
@@ -39,11 +40,14 @@ module.exports = function (options = {}) {
 
     const method = apiName.slice(apiName.lastIndexOf('-') + 1);
 
+    const apiMethod = require('../APIs/js/'+apiName);
+
     //if not define permission for api, by default find and get is always allowed to access
     if(!jsonPermissions[apiName] && ['find','get'].includes(method) ){
-      return context;
+      return await apiMethod(context, options);
     }
 
+    const permissionService = context.app.service('permissions');
     let permissions = jsonPermissions[apiName]['permissions'] ? jsonPermissions[apiName]['permissions'] : [];
 
     const allowPermissions = await permissions.map( async path => {
@@ -56,8 +60,8 @@ module.exports = function (options = {}) {
         if (results.total === 1){
           return results.data[0];
         }
-      })
-    })
+      });
+    });
 
     const roleService = context.app.service('roles');
 
@@ -73,14 +77,14 @@ module.exports = function (options = {}) {
           if (ap._id.equal(p.oid)){
             isAllowed = true;
           }
-        })
-      })
-    })
+        });
+      });
+    });
 
     if (!isAllowed){
       throw new Error('user is not allowed to access api!');
     } 
 
-    return context;
+    return await apiMethod(context, options);
   };
 };
