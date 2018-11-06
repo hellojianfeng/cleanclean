@@ -14,7 +14,7 @@ module.exports = function (options = {}) {
     let orgs = [];
 
     if(Array.isArray(context.result)){
-      orgs = context.result
+      orgs = context.result;
     } else {
       orgs.push(context.result);
     }
@@ -28,7 +28,7 @@ module.exports = function (options = {}) {
           org: o._id
         }
       );
-      const everyone = await permissionService.create(
+      await permissionService.create(
         {
           name: 'everyone',
           org: o._id
@@ -64,7 +64,7 @@ module.exports = function (options = {}) {
 
       //add default initialize operation for org
       await operationService.create({
-        name: "org-initialize",
+        name: 'org-initialize',
         org: o._id,
         permissions: [
           {
@@ -73,7 +73,7 @@ module.exports = function (options = {}) {
           }
         ]
       });
-    }))
+    }));
 
     return context;
   };

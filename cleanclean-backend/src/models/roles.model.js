@@ -7,7 +7,15 @@ module.exports = function (app) {
   const { Schema } = mongooseClient;
   const permissionSchema = new Schema({
     oid: { type: Schema.Types.ObjectId },
-    path: { type: String }, // dot sperated string, for example, company1#department1#office1, default is same as name
+    path: { type: String }, 
+    include: {
+      children: { recursive: Boolean },
+      parent: { recursive: Boolean },
+    },
+    exclude: {
+      children: [{ path: { type: String }, recursive: { type: Boolean } }],
+      parent: [{ path: { type: String }, recursive: { type: Boolean } }],
+    },
     data: { type: Schema.Types.Mixed }
   });
   const roles = new Schema({

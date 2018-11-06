@@ -1,11 +1,11 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
 const beforeCreateRunOperation = require('../../hooks/before-create-run-operation');
 
-const checkApiPermission = require('../../hooks/check-api-permission');
+//const checkApiPermission = require('../../hooks/check-api-permission');
 
 module.exports = {
   before: {
-    all: [ authenticate('jwt'), checkApiPermission() ],
+    all: [ authenticate('jwt') ],
     find: [],
     get: [],
     create: [beforeCreateRunOperation()],
