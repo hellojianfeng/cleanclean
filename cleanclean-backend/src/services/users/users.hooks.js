@@ -4,15 +4,17 @@ const {
   hashPassword, protect
 } = require('@feathersjs/authentication-local').hooks;
 
+const checkApiPermission = require('../../hooks/check-api-permission');
+
 module.exports = {
   before: {
-    all: [],
-    find: [ authenticate('jwt') ],
-    get: [ authenticate('jwt') ],
+    all: [ checkApiPermission() ],
+    find: [ authenticate('jwt')],
+    get: [ authenticate('jwt')],
     create: [ hashPassword() ],
     update: [ hashPassword(),  authenticate('jwt') ],
     patch: [ hashPassword(),  authenticate('jwt') ],
-    remove: [ authenticate('jwt') ]
+    remove: [ authenticate('jwt')]
   },
 
   after: {

@@ -7,6 +7,7 @@ module.exports = function (options = {}) {
 
     //add admin role
     const roleService = context.app.service('roles');
+    const permissionService = context.app.service('permissions');
     const userService = context.app.service('users');
     const operationService = context.app.service('operations');
 
@@ -21,17 +22,34 @@ module.exports = function (options = {}) {
     const roles = context.params.user.roles || [];
 
     await Promise.all(orgs.map( async o => {
+      const administrators = await permissionService.create(
+        {
+          name: 'administrators',
+          org: o._id
+        }
+      );
+      const everyone = await permissionService.create(
+        {
+          name: 'everyone',
+          org: o._id
+        }
+      );
       //each org admin role
       const admin = await roleService.create({
         name: 'admin',
+        permissions: [
+          {
+            oid: administrators._id,
+            path: administrators.path
+          }
+        ],
         org: o._id
       });
 
       //add admin to user
       roles.push({
-        role: {
-          oid: admin._id
-        },
+        oid: admin._id,
+        path: admin.path,
         org: {
           oid: o._id,
           path: o.path
@@ -48,9 +66,10 @@ module.exports = function (options = {}) {
       await operationService.create({
         name: "org-initialize",
         org: o._id,
-        roles: [
+        permissions: [
           {
-            oid: admin._id
+            oid: administrators._id,
+            path: administrators.path
           }
         ]
       });
