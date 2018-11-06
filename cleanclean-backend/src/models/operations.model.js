@@ -5,7 +5,6 @@
 module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const { Schema } = mongooseClient;
-  const { ProgressSchema } = require('./schemas')(app);
   const operationStage = new Schema({
     name: { type: String }, //for example, ready, start, end, ....
     display_name: { type: String },
@@ -22,16 +21,9 @@ module.exports = function (app) {
    * if want to exclude one or its children(parent) from all children(parent), exclude property is 
    * used for that purpose
    */
-  const operationRole = new Schema({
+  const operationPermission = new Schema({
     oid: { type: Schema.Types.ObjectId },
-    include: {
-      children: { recursive: Boolean },
-      parent: { recursive: Boolean },
-    },
-    exclude: {
-      children: [{ path: { type: String }, recursive: { type: Boolean } }],
-      parent: [{ path: { type: String }, recursive: { type: Boolean } }],
-    },
+    path: { type: String },
     data: { type: Schema.Types.Mixed }
   });
 
@@ -44,7 +36,7 @@ module.exports = function (app) {
     data: { type: Schema.Types.Mixed },
     app: { type: String, default: 'default' },
     org: { type: Schema.Types.ObjectId, required: true  },
-    roles: [ operationRole ],
+    permissions: [ operationPermission ],
     stages: [ operationStage ],
     concurrent: { 
       allow: { type: Number },

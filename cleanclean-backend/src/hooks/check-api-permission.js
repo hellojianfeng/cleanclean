@@ -20,9 +20,9 @@ module.exports = function (options = {}) {
       if(!user.current_org){
         throw new Error('current org is not found!');
       }
-      if(!context.data.org.equal(user.current_org)){
-        throw new Error('user is not allowed to execute api from different org!');
-      }
+      // if(!context.data.org.equal(user.current_org)){
+      //   throw new Error('user is not allowed to execute api from different org!');
+      // }
     }
 
     return context;

@@ -2,11 +2,11 @@ const { authenticate } = require('@feathersjs/authentication').hooks;
 
 const addNestedPath = require('../../hooks/add-nested-path');
 
-const checkApiPermission = require('../../hooks/check-api-permission');
+//const checkApiPermission = require('../../hooks/check-api-permission');
 
 module.exports = {
   before: {
-    all: [ authenticate('jwt'), checkApiPermission() ],
+    all: [ authenticate('jwt') ],
     find: [],
     get: [],
     create: [addNestedPath()],

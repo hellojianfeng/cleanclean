@@ -1,6 +1,3 @@
-
-const orgInitialize = require('../operations/js/default/org-initialize');
-const operationDataGet = require('../operations/js/default/operation-data-get');
 const fileTool = require('../utils/file.js');
 
 // eslint-disable-next-line no-unused-vars
@@ -42,7 +39,7 @@ module.exports = function (options = {}) {
         org: orgId.toString(),
         app: appName
       }
-    }).then ( results => {
+    }).then ( async results => {
       if (results.total < 1){
         throw new Error('fail to find operation!, operation = '+operationPath);
       }
@@ -61,15 +58,25 @@ module.exports = function (options = {}) {
 
       let isAllowOperation = false;
 
-      user.roles.map ( uo => {
-        if( uo.org.oid.equals(orgId)){
-          operation.roles.map( oo => {
-            if(uo.role.oid.equals(oo.oid)){
+      const roleService = context.app.service('roles');
+
+      await Promise.all(user.roles.map ( async ur => {
+        if( ur.org.oid.equals(orgId)){
+          const role = await roleService.get(ur.oid);
+          operation.permissions.map( op => {
+            //always allow everyone operation to run
+            if (op.path === 'everyone') {
               isAllowOperation = true;
+            } else {
+              role.permissions.map ( rp => {
+                if (rp.oid.equals(op.oid)){
+                  isAllowOperation = true;
+                }
+              });
             }
           });
         }
-      });
+      }));
 
       if(isAllowOperation === false){
         throw new Error('user is not allowed to run operation! operation = '+operationPath);
@@ -103,13 +110,9 @@ module.exports = function (options = {}) {
       operation.data = runData;
       operation.org = org;
 
-      if(operation.path.toLowerCase() === 'org-initialize'){
-        context = orgInitialize(context, operation);
-      }
+      const doOperation = require('../operations/js/'+ appName + '/' + operation.path.toLowerCase());
 
-      if(operation.path.toLowerCase() === 'operation-data-get'){
-        context = operationDataGet(context, operation);
-      }
+      return doOperation(context, Object.assign(options, { operation }));
       
     });
 

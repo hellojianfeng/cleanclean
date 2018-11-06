@@ -6,11 +6,11 @@ const beforeAddOrg = require('../../hooks/before-add-org');
 
 const afterCreateOrg = require('../../hooks/after-create-org');
 
-const checkApiPermission = require('../../hooks/check-api-permission');
+//const checkApiPermission = require('../../hooks/check-api-permission');
 
 module.exports = {
   before: {
-    all: [ authenticate('jwt'), checkApiPermission() ],
+    all: [ authenticate('jwt') ],
     find: [],
     get: [],
     create: [addNestedPath('#'), beforeAddOrg()],
