@@ -2,6 +2,8 @@
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 
 // eslint-disable-next-line no-unused-vars
+const userRoleFind = require('../APIs/js/user-role-find');
+const userPermissionFind = require('../APIs/js/user-permission-find');
 module.exports = function (options = {}) {
   return async context => {
 
@@ -46,43 +48,34 @@ module.exports = function (options = {}) {
       return await apiMethod(context, options);
     }
 
-    const permissionService = context.app.service('permissions');
-    let permissions = jsonPermissions[apiName]['permissions'] ? jsonPermissions[apiName]['permissions'] : [];
-
-    const allowPermissions = await permissions.map( async path => {
-      return await permissionService.find({
-        query: {
-          org: user.current_org,
-          path: path
-        }
-      }).then( results => {
-        if (results.total === 1){
-          return results.data[0];
-        }
-      });
-    });
-
-    const roleService = context.app.service('roles');
-
-    const userRoles = await user.roles.map( async o => {
-      return await roleService.get(o._id);
-    });
-
     let isAllowed = false;
 
-    userRoles.map ( role => {
-      role.permissions.map ( p => {
-        allowPermissions.map ( ap => {
-          if (ap._id.equal(p.oid)){
-            isAllowed = true;
-          }
-        });
-      });
-    });
+    await userRoleFind(context);
+
+    const userRoles = context.result;
+
+    jsonApiPermissions.roles.map ( o => {
+      if (userRoles.hasOwnProperty(o.path)){
+        isAllowed = true;
+      }
+    })
+
+    await userPermissionFind(context);
+
+    const userPermissions = context.result;
+
+    jsonApiPermissions.permissions.map ( o => {
+      if (userPermissions.hasOwnProperty(o.path)){
+        isAllowed = true;
+      }
+    })
 
     if (!isAllowed){
       throw new Error('user is not allowed to access api!');
     } 
+
+    //reset context result
+    context.result = null
 
     return await apiMethod(context, options);
   };

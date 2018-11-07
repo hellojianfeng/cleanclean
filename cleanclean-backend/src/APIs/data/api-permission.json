@@ -1,1 +1,19 @@
-{}
+{
+    "someapi-permission-example": {
+        "roles": [ 
+            {
+                "path": "path1",
+                "include": {
+                    "children": {
+                        "recursive": true
+                    }
+                }
+            }
+        ],
+        "permissions": [
+            {
+                "path": "path1"
+            }
+        ]
+    }
+}

@@ -5,12 +5,12 @@
 module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const { Schema } = mongooseClient;
-  const permissionSchema = new Schema({
+  const theSchema = new Schema({
     oid: { type: Schema.Types.ObjectId },
     path: { type: String }, 
     include: {
-      children: { recursive: Boolean },
-      parent: { recursive: Boolean },
+      children: [{ path: { type: String }, recursive: { type: Boolean } }],
+      parent: [{ path: { type: String }, recursive: { type: Boolean } }],
     },
     exclude: {
       children: [{ path: { type: String }, recursive: { type: Boolean } }],
@@ -24,7 +24,8 @@ module.exports = function (app) {
     description: { type: String },
     path: { type: String }, // dot sperated string, for example, company1#department1#office1, default is same as name
     org: { type: Schema.Types.ObjectId, required: true  },
-    permissions: [ permissionSchema ],
+    permissions: [ theSchema ],
+    operations: [ theSchema ],
     data: { type: Schema.Types.Mixed }
   }, {
     timestamps: true

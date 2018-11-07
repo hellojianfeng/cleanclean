@@ -39,7 +39,10 @@ const orgInitialize = async function (context, options = {}) {
     });
 
     if (permissions.length > 0) {
-      await permissionService.create(permissions);
+      const results = await permissionService.create(permissions);
+      if (results.total > 0){
+        permissions = results.data;
+      }
     }
   }
 
@@ -51,7 +54,10 @@ const orgInitialize = async function (context, options = {}) {
       o.permissions.map ( op => {
         return permissions.map ( ppo => {
           if (ppo.path === op.path){
-            newPermissions.push(ppo);
+            newPermissions.push({
+              oid: ppo._id,
+              path: ppo.path
+            });
           }
         });
       });
@@ -66,23 +72,34 @@ const orgInitialize = async function (context, options = {}) {
 
   //add org operations
   if(runData.operations && Array.isArray(runData.operations)){
-    const operations = runData.operations.map( o => {
+    await Promise.all(runData.operations.map( async o => {
       o.org = orgId;
-      const newPermissions = [];
-      o.permissions.map ( op => {
-        return permissions.map ( ppo => {
+      const newOperation = await operationService.create(o);
+
+      //add operation into permission
+      await Promise.all(o.permissions.map ( op => {
+        return permissions.map ( async ppo => {
           if (ppo.path === op.path){
-            newPermissions.push(ppo);
+            //first check whether operation under permission
+            const newOperations = ppo.operations;
+            const filterResults = newOperation.filter ( 
+              oo =>  oo.oid.equals(newOperation._id)
+            )
+            
+            //if not exist in permission, add operation into permission
+            if(filterResults.length === 0){
+              newOperation.push({
+                oid: newOperation._id,
+                path: newOperation.path
+              })
+            }
+            await permissionService.patch(ppo._id, {
+              operations: newOperations
+            })
           }
         });
-      });
-      o.permissions = newPermissions;
-      return o;
-    });
-
-    if (operations.length > 0){
-      await operationService.create(operations);
-    }
+      }));
+    }));
   }
 
   //add sub-orgs
@@ -96,6 +113,9 @@ const orgInitialize = async function (context, options = {}) {
       await orgService.create(orgs, context.params);
     }
   }
+
+  //reset current org for user which is changed by add sub org
+  context.params.user.current_org = orgId;
 
   return context;
 };

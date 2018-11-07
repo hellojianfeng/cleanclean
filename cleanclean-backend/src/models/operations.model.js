@@ -15,18 +15,6 @@ module.exports = function (app) {
     data: { type: Schema.Types.Mixed }
   });
 
-  /** operation role define role to allow run operation, children(parent) means children(parent) 
-   * role can also run operation, if specify recursive as true, means recursive children(parent) is 
-   * allowed to run operation, if not specify recursive, means recursive is false 
-   * if want to exclude one or its children(parent) from all children(parent), exclude property is 
-   * used for that purpose
-   */
-  const operationPermission = new Schema({
-    oid: { type: Schema.Types.ObjectId },
-    path: { type: String },
-    data: { type: Schema.Types.Mixed }
-  });
-
   const operations = new Schema({
     name: { type: String, required: true },
     path: { type: String, required: true },//dot seperate name of operation, unique in app
@@ -36,7 +24,6 @@ module.exports = function (app) {
     data: { type: Schema.Types.Mixed },
     app: { type: String, default: 'default' },
     org: { type: Schema.Types.ObjectId, required: true  },
-    permissions: [ operationPermission ],
     stages: [ operationStage ],
     concurrent: { 
       allow: { type: Number },

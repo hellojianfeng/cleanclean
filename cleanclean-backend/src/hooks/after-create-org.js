@@ -22,11 +22,22 @@ module.exports = function (options = {}) {
     const roles = context.params.user.roles || [];
 
     await Promise.all(orgs.map( async o => {
+      //add default initialize operation for org
+      const orgInitialize = await operationService.create({
+        name: 'org-initialize',
+        org: o._id,
+      });
       const administrators = await permissionService.create(
         {
           name: 'administrators',
-          org: o._id
-        }
+          org: o._id,
+          operations: [
+            {
+              oid: orgInitialize._id,
+              path: orgInitialize.path
+            }
+          ]
+        },
       );
       await permissionService.create(
         {
@@ -60,18 +71,6 @@ module.exports = function (options = {}) {
       await userService.patch(context.params.user._id, {
         roles:roles,
         current_org: o._id
-      });
-
-      //add default initialize operation for org
-      await operationService.create({
-        name: 'org-initialize',
-        org: o._id,
-        permissions: [
-          {
-            oid: administrators._id,
-            path: administrators.path
-          }
-        ]
       });
     }));
 
