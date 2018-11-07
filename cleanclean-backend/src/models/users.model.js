@@ -6,7 +6,7 @@ module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const { Schema } = mongooseClient;
 
-  const roleSchema = new Schema({
+  const theSchema = new Schema({
     oid: { type: Schema.Types.ObjectId },
     path: { type: String }, // dot sperated string, for example, default is same as name
     org: { 
@@ -31,7 +31,9 @@ module.exports = function (app) {
       data: { type: Schema.Types.Mixed }
     },
     password: { type: String },
-    roles: [ roleSchema ],
+    roles: [ theSchema ],
+    permissions: [ theSchema ],
+    operations: [ theSchema ],
     current_org: { type: Schema.Types.ObjectId },
     data: {type: Schema.Types.Mixed}
   }, {

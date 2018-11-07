@@ -1,4 +1,5 @@
 const fileTool = require('../utils/file.js');
+const userOperationFind = require('../APIs/js/user-operation-find');
 
 // eslint-disable-next-line no-unused-vars
 module.exports = function (options = {}) {
@@ -33,7 +34,7 @@ module.exports = function (options = {}) {
       throw new Error('not find current org for user!');
     }
 
-    await operationService.find({
+    return await operationService.find({
       query: {
         path: operationPath,
         org: orgId.toString(),
@@ -58,25 +59,33 @@ module.exports = function (options = {}) {
 
       let isAllowOperation = false;
 
-      const roleService = context.app.service('roles');
+      const permissionService = context.app.service('permissions');
 
-      await Promise.all(user.roles.map ( async ur => {
-        if( ur.org.oid.equals(orgId)){
-          const role = await roleService.get(ur.oid);
-          operation.permissions.map( op => {
-            //always allow everyone operation to run
-            if (op.path === 'everyone') {
-              isAllowOperation = true;
-            } else {
-              role.permissions.map ( rp => {
-                if (rp.oid.equals(op.oid)){
-                  isAllowOperation = true;
-                }
-              });
-            }
-          });
+      const finds = await permissionService.find({
+        query: {
+          org: operation.org,
+          path: 'everyone'
         }
-      }));
+      });
+
+      const everyoneOperations = finds.total === 1 ? finds.data[0]['operations'] : [];
+
+      everyoneOperations.map ( o => {
+        if ( o.oid.equals(operation._id)){
+          isAllowOperation = true;
+        }
+      })
+
+      const tempContext = Object.assign({},context);
+      await userOperationFind(tempContext);
+
+      const userOperations = Object.values(tempContext.result);
+
+      userOperations.map ( o => {
+        if (operation._id.equals(o._id)){
+          isAllowOperation = true;
+        }
+      });
 
       if(isAllowOperation === false){
         throw new Error('user is not allowed to run operation! operation = '+operationPath);
