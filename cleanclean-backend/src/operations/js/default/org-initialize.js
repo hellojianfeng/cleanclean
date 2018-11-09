@@ -30,38 +30,84 @@ const orgInitialize = async function (context, options = {}) {
 
   //add org profiles
 
-  //add permissions
-  const permissions = [];
-  if(runData.permissions && Array.isArray(runData.permissions)){
-    runData.permissions.map( o => {
+  //add org operations
+  const newOperations = [];
+  if(runData.operations && Array.isArray(runData.operations) && typeof runData.operations === 'object'){
+    Object.values(runData.operations).map( o => {
       o.org = orgId;
-      permissions.push(o);
+      newOperations.push(o);
     });
 
-    if (permissions.length > 0) {
-      const results = await permissionService.create(permissions);
+    if (newOperations.length > 0) {
+      const results = await operationService.create(newOperations);
       if (results.total > 0){
-        permissions = results.data;
+        newOperations = results.data;
+      }
+    }
+    // await Promise.all(Object.values(runData.operations).map( async o => {
+    //   o.org = orgId;
+    //   const newOperation = await operationService.create(o);
+    //   newOperations.push(newOperation);
+
+    //   //add operation into permission
+    //   // await Promise.all(o.permissions.map ( op => {
+    //   //   return permissions.map ( async ppo => {
+    //   //     if (ppo.path === op.path){
+    //   //       //first check whether operation under permission
+    //   //       const newOperations = ppo.operations;
+    //   //       const filterResults = newOperation.filter ( 
+    //   //         oo =>  oo.oid.equals(newOperation._id)
+    //   //       )
+            
+    //   //       //if not exist in permission, add operation into permission
+    //   //       if(filterResults.length === 0){
+    //   //         newOperation.push({
+    //   //           oid: newOperation._id,
+    //   //           path: newOperation.path
+    //   //         })
+    //   //       }
+    //   //       await permissionService.patch(ppo._id, {
+    //   //         operations: newOperations
+    //   //       })
+    //   //     }
+    //   //   });
+    //   // }));
+    // }));
+  }
+
+  //add permissions
+  const newPermissions = [];
+  const runPermissions = runData.permissions;
+  if( runPermissions && typeof runPermissions === 'object' && !runPermissions instanceof Array){
+    Object.values(runPermissions).map( o => {
+      o.org = orgId;
+      newPermissions.push(o);
+    });
+
+    if (newPermissions.length > 0) {
+      const results = await permissionService.create(newPermissions);
+      if (results.total > 0){
+        newPermissions = results.data;
       }
     }
   }
 
   //add org roles
-  if(runData.roles && Array.isArray(runData.roles)){
-    const roles = runData.roles.map( o => {
+  if(runData.roles && !Array.isArray(runData.roles) && typeof runData.roles === 'object'){
+    const roles = Object.values(runData.roles).map( o => {
       o.org = orgId;
-      const newPermissions = [];
+      const rolePermissions = [];
       o.permissions.map ( op => {
-        return permissions.map ( ppo => {
+        return newPermissions.map ( ppo => {
           if (ppo.path === op.path){
-            newPermissions.push({
+            rolePermissions.push({
               oid: ppo._id,
               path: ppo.path
             });
           }
         });
       });
-      o.permissions = newPermissions;
+      o.permissions = rolePermissions;
       return o;
     });
 
@@ -70,37 +116,7 @@ const orgInitialize = async function (context, options = {}) {
     }
   }
 
-  //add org operations
-  if(runData.operations && Array.isArray(runData.operations)){
-    await Promise.all(runData.operations.map( async o => {
-      o.org = orgId;
-      const newOperation = await operationService.create(o);
-
-      //add operation into permission
-      await Promise.all(o.permissions.map ( op => {
-        return permissions.map ( async ppo => {
-          if (ppo.path === op.path){
-            //first check whether operation under permission
-            const newOperations = ppo.operations;
-            const filterResults = newOperation.filter ( 
-              oo =>  oo.oid.equals(newOperation._id)
-            )
-            
-            //if not exist in permission, add operation into permission
-            if(filterResults.length === 0){
-              newOperation.push({
-                oid: newOperation._id,
-                path: newOperation.path
-              })
-            }
-            await permissionService.patch(ppo._id, {
-              operations: newOperations
-            })
-          }
-        });
-      }));
-    }));
-  }
+  
 
   //add sub-orgs
   if(runData.orgs && Array.isArray(runData.orgs)){
@@ -116,6 +132,10 @@ const orgInitialize = async function (context, options = {}) {
 
   //reset current org for user which is changed by add sub org
   context.params.user.current_org = orgId;
+  const userService = context.app.service('users');
+  await userService.patch(context.params.user._id, {
+    current_org: o._id
+  });
 
   return context;
 };

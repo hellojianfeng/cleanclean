@@ -44,7 +44,13 @@ module.exports = function (options = {}) {
           name: 'everyone',
           org: o._id
         }
-      );
+      );//no need to assign user to this permission
+      await permissionService.create(
+        {
+          name: 'self',
+          org: o._id
+        }
+      );//no need to assign user to this permission
       //each org admin role
       const admin = await roleService.create({
         name: 'admin',

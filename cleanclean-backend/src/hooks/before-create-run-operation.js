@@ -1,4 +1,5 @@
-const fileTool = require('../utils/file.js');
+
+const JsonTools = require('../utils/JsonTools.js');
 const userOperationFind = require('../APIs/js/user-operation-find');
 
 // eslint-disable-next-line no-unused-vars
@@ -94,27 +95,19 @@ module.exports = function (options = {}) {
       const processData = context.data.data || {};
       const orgData = org.data || {};
       const operationData = operation.data || {};
+      const readyToMergeList = [];
 
       const typePath = orgType ? orgType.path : 'company';
 
-      let orgTypeJsonData = {};
-      let orgJsonData = {};
+      const typeJsons = JsonTools.getJsonsFromPathFiles('../operations/data/org-types/'+ typePath, 'org-initialize.json');
 
-      const orgTypeJsonDataPath = fileTool.getTailFileInDotFolder('src/operations/data/org-types/'+ typePath, 'org-initialize.json');
-      
-      if(orgTypeJsonDataPath){
-        orgTypeJsonData = require(orgTypeJsonDataPath.replace(/^src/,'..'));
-      }
+      typeJsonData = JsonTools.mergeObjectInArray(typeJsons,4);
 
-      const orgJsonDataPath = fileTool.getTailFileInDotFolder('src/operations/data/orgs/'+ org.path, 'org-initialize.json','#');
-      
-      if(orgJsonDataPath){
-        orgJsonData = require(orgJsonDataPath.replace(/^src/,'..'));
-      }
+      const orgJsons = JsonTools.getJsonsFromPathFiles('../operations/data/orgs/'+ org.path, 'org-initialize.json');
 
-      let runData = {};
+      orgJsonData = JsonTools.mergeObjectInArray(orgJsons,4);
 
-      Object.assign(runData, orgData, operationData, orgTypeJsonData.data, orgJsonData, processData);
+      const runData = JsonTools.mergeObjects(4,typeJsonData.data,orgJsonData.data,operationData,processData)
 
       operation.data = runData;
       operation.org = org;

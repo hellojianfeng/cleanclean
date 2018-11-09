@@ -1,0 +1,26 @@
+{
+	"operation":"org-initialize",
+	"app":"default",
+	"inherient_parent":false,
+	"data":{
+		"permissions":{
+			"department_member":{
+				"name":"department_member",
+				"description":"department member permission in org"
+			}
+		},
+		"roles": {
+			"department_member":{
+				"name":"department_member",
+				"permissions":["department_member"],
+				"description":"department member role"
+			}
+		},
+		"operations":{
+			
+		},
+		"orgs":{
+		
+		}
+	}
+}

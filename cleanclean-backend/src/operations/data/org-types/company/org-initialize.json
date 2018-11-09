@@ -2,50 +2,60 @@
 	"operation":"org-initialize",
 	"app":"default",
 	"data":{
-		"permissions":[
-			{
-				"name":"member",
-				"description":"member permission in org"
+		"permissions":{
+			"employee":{
+				"name":"employee",
+				"description":"employee permission in org"
 			},
-			{
+			"customer":{
+				"name":"customer",
+				"description":"customer permission in org"
+			},
+			"public": {
 				"name":"public",
 				"description":"public permission in org"
 			}
-		],
-		"roles": [
-			{
-				"name":"member",
-				"permissions":[
-					{
-						"path":"member"
-					}
-				],
-				"description":"all users in org exclude public"
+		},
+		"roles": {
+			"employee":{
+				"name":"employee",
+				"permissions":["employee"],
+				"description":"employee role"
 			},
-			{
+			"customer":{
+				"name":"customer",
+				"permissions": ["customer"],
+				"description":"customer role"
+			},
+			"public":{
 				"name":"public",
-				"permissions":[
-					{
-						"path":"public"
-					}
-				],
-				"description":"public users in org"
+				"permissions":["public"],
+				"description":"public role in org"
 			}
-		],
-		"operations":[],
-		"orgs":[
-			{
-				"name":"finance",
-				"type":"department.finance"
+		},
+		"operations":{
+			"user-profile":{
+				"name":"user-profile",
+				"roles":["self"]
 			},
-			{
-				"name":"hr",
-				"type":"department.hr"
+			"org-profile-management":{
+				"name":"org-profile-management",
+				"roles":["admin"]
 			},
-			{
-				"name":"service",
-				"type":"department.service"
+			"org-operation-management":{
+				"name":"org-operation-management",
+				"roles":["admin"]
+			},
+			"org-user-management":{
+				"name":"org-user-management",
+				"role":["admin"]
 			}
-		]
+		},
+		"orgs":{
+			"department.system":{
+				"name":"system department",
+				"type":"company.department.system"
+			}
+		}
 	}
 }

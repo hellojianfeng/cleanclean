@@ -1,0 +1,51 @@
+{
+	"operation":"org-initialize",
+	"app":"default",
+	"data":{
+		"permissions":{
+			"member":{
+				"name":"member",
+				"description":"member permission in org"
+			},
+			"public": {
+				"name":"public",
+				"description":"public permission in org"
+			}
+		},
+		"roles": {
+			"member":{
+				"name":"member",
+				"permissions":[
+					{
+						"path":"member"
+					}
+				],
+				"description":"all users in org exclude public"
+			},
+			"public":{
+				"name":"public",
+				"permissions":[
+					{
+						"path":"public"
+					}
+				],
+				"description":"public users in org"
+			}
+		},
+		"operations":{},
+		"orgs":{
+			"department.hr":{
+				"name":"human resource",
+				"type":"department.hr"
+			},
+			"department.project":{
+				"name":"project department",
+				"type":"department.project"
+			},
+			"department.service":{
+				"name":"service department",
+				"type":"department.service"
+			}
+		}
+	}
+}
