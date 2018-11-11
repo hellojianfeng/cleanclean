@@ -41,7 +41,7 @@ module.exports = function (options = {}) {
               return typeService.create(type).then( o => {
                 context.data.type.oid = o._id;
                 return resolve(context);
-              })
+              });
             }
           });
         }

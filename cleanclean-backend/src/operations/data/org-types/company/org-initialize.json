@@ -2,6 +2,24 @@
 	"operation":"org-initialize",
 	"app":"default",
 	"data":{
+		"operations":{
+			"user-profile":{
+				"name":"user-profile",
+				"roles":["self"]
+			},
+			"org-profile-management":{
+				"name":"org-profile-management",
+				"roles":["admin"]
+			},
+			"org-operation-management":{
+				"name":"org-operation-management",
+				"roles":["admin"]
+			},
+			"org-user-management":{
+				"name":"org-user-management",
+				"roles":["admin"]
+			}
+		},
 		"permissions":{
 			"employee":{
 				"name":"employee",
@@ -20,6 +38,7 @@
 			"employee":{
 				"name":"employee",
 				"permissions":["employee"],
+				"operations":[],
 				"description":"employee role"
 			},
 			"customer":{
@@ -31,24 +50,6 @@
 				"name":"public",
 				"permissions":["public"],
 				"description":"public role in org"
-			}
-		},
-		"operations":{
-			"user-profile":{
-				"name":"user-profile",
-				"roles":["self"]
-			},
-			"org-profile-management":{
-				"name":"org-profile-management",
-				"roles":["admin"]
-			},
-			"org-operation-management":{
-				"name":"org-operation-management",
-				"roles":["admin"]
-			},
-			"org-user-management":{
-				"name":"org-user-management",
-				"role":["admin"]
 			}
 		},
 		"orgs":{

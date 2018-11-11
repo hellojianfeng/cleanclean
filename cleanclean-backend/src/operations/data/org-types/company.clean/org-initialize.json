@@ -1,6 +1,7 @@
 {
 	"operation":"org-initialize",
 	"app":"default",
+	"merge_parent": true,
 	"data":{
 		"permissions":[
 			{

@@ -6,7 +6,7 @@
  * return: 
  * org list with user's roles
  */
-module.exports = async function (context, options = {}) {
+module.exports = async function (context) {
 
   const user = context.params.user;
 

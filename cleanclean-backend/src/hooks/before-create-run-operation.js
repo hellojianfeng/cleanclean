@@ -75,7 +75,7 @@ module.exports = function (options = {}) {
         if ( o.oid.equals(operation._id)){
           isAllowOperation = true;
         }
-      })
+      });
 
       const tempContext = Object.assign({},context);
       await userOperationFind(tempContext);
@@ -93,21 +93,19 @@ module.exports = function (options = {}) {
       }
 
       const processData = context.data.data || {};
-      const orgData = org.data || {};
       const operationData = operation.data || {};
-      const readyToMergeList = [];
 
       const typePath = orgType ? orgType.path : 'company';
 
       const typeJsons = JsonTools.getJsonsFromPathFiles('../operations/data/org-types/'+ typePath, 'org-initialize.json');
 
-      typeJsonData = JsonTools.mergeObjectInArray(typeJsons,4);
+      const typeJsonData = JsonTools.mergeObjectInArray(typeJsons,4);
 
       const orgJsons = JsonTools.getJsonsFromPathFiles('../operations/data/orgs/'+ org.path, 'org-initialize.json');
 
-      orgJsonData = JsonTools.mergeObjectInArray(orgJsons,4);
+      const orgJsonData = JsonTools.mergeObjectInArray(orgJsons,4);
 
-      const runData = JsonTools.mergeObjects(4,typeJsonData.data,orgJsonData.data,operationData,processData)
+      const runData = JsonTools.mergeObjects(4,typeJsonData.data,orgJsonData.data,operationData,processData);
 
       operation.data = runData;
       operation.org = org;
@@ -117,7 +115,5 @@ module.exports = function (options = {}) {
       return doOperation(context, Object.assign(options, { operation }));
       
     });
-
-    return context;
   };
 };

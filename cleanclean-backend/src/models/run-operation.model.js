@@ -5,7 +5,7 @@
 module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const { Schema } = mongooseClient;
-  const { ProgressSchema } = require("./schemas")(app);
+  const { ProgressSchema } = require('./schemas')(app);
   const runOperation = new Schema({
     operation: { 
       oid: { type: Schema.Types.ObjectId },

@@ -16,7 +16,7 @@ module.exports = async function (context, options = {}) {
   let permission = null;
 
   if (options.permission_id && options.permission_id instanceof mongooseClient.Types.ObjectId){
-    permission = await permissionService.get(options.permission_id)
+    permission = await permissionService.get(options.permission_id);
   } else {
     context.result = {};
     return context;

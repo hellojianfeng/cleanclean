@@ -8,8 +8,8 @@ module.exports = {
     find: [],
     get: [],
     create: [addNestedPath()],
-    update: [addNestedPath()],
-    patch: [addNestedPath()],
+    update: [],
+    patch: [],
     remove: []
   },
 
