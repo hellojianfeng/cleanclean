@@ -9,7 +9,7 @@
 module.exports = async function (context, options = {}) {
 
   const mongooseClient = context.app.get('mongooseClient');
-  const { Schema } = mongooseClient;
+  //const { Schema } = mongooseClient;
 
   const roleService = context.app.service('roles');
   const permissionService = context.app.service('permissions');
@@ -17,7 +17,7 @@ module.exports = async function (context, options = {}) {
   let role = null;
 
   if (options.role_id && options.role_id instanceof mongooseClient.Types.ObjectId){
-    role = await roleService.get(options.role_id)
+    role = await roleService.get(options.role_id);
   } else {
     context.result = {};
     return context;
@@ -33,6 +33,6 @@ module.exports = async function (context, options = {}) {
 
   context.result = permissionList;
 
-  return context;
+  return context.result;
 };
 

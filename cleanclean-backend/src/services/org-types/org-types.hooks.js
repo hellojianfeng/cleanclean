@@ -9,7 +9,7 @@ module.exports = {
     find: [],
     get: [],
     create: [addNestedPath()],
-    update: [addNestedPath()],
+    update: [],
     patch: [],
     remove: []
   },

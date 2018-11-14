@@ -10,7 +10,6 @@ const rolePermissionFind = require('./role-permission-find');
 module.exports = async function (context, options = {}) {
 
   const mongooseClient = context.app.get('mongooseClient');
-  const { Schema } = mongooseClient;
 
   const user = context.params.user;
 
@@ -42,6 +41,6 @@ module.exports = async function (context, options = {}) {
   
   context.result = permissionList;
 
-  return context;
+  return context.result;
 };
 

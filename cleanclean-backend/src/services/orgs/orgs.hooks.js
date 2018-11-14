@@ -14,8 +14,8 @@ module.exports = {
     find: [],
     get: [],
     create: [addNestedPath('#'), beforeAddOrg()],
-    update: [addNestedPath('#'), beforeAddOrg()],
-    patch: [addNestedPath('#'), beforeAddOrg()],
+    update: [beforeAddOrg()],
+    patch: [beforeAddOrg()],
     remove: []
   },
 

@@ -1,7 +1,7 @@
 {
     "someapi-permission-example": {
-        "roles": [ 
-            {
+        "roles": {
+            "path1":{
                 "path": "path1",
                 "include": {
                     "children": {
@@ -9,11 +9,11 @@
                     }
                 }
             }
-        ],
-        "permissions": [
-            {
+        },
+        "permissions": {
+            "path1":{
                 "path": "path1"
             }
-        ]
+        }
     }
 }

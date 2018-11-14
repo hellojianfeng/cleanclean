@@ -39,12 +39,18 @@ module.exports = function (options = {}) {
           ]
         },
       );
-      await permissionService.create(
+      const pEveryone = await permissionService.create(
         {
           name: 'everyone',
           org: o._id
         }
-      );
+      );//no need to assign user to this permission
+      const pSelf = await permissionService.create(
+        {
+          name: 'self',
+          org: o._id
+        }
+      );//no need to assign user to this permission
       //each org admin role
       const admin = await roleService.create({
         name: 'admin',
@@ -52,6 +58,30 @@ module.exports = function (options = {}) {
           {
             oid: administrators._id,
             path: administrators.path
+          }
+        ],
+        org: o._id
+      });
+
+      //create self role
+      await roleService.create({
+        name: 'self',
+        permissions: [
+          {
+            oid: pSelf._id,
+            path: pSelf.path
+          }
+        ],
+        org: o._id
+      });
+
+      //create everyone role
+      await roleService.create({
+        name: 'everyone',
+        permissions: [
+          {
+            oid: pEveryone._id,
+            path: pEveryone.path
           }
         ],
         org: o._id

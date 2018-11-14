@@ -1,20 +1,19 @@
 {
 	"operation":"org-initialize",
 	"app":"default",
-	"merge_parent": true,
 	"data":{
-		"permissions":[
-			{
+		"permissions":{
+			"member":{
 				"name":"member",
 				"description":"member permission in org"
 			},
-			{
+			"public": {
 				"name":"public",
 				"description":"public permission in org"
 			}
-		],
-		"roles": [
-			{
+		},
+		"roles": {
+			"member":{
 				"name":"member",
 				"permissions":[
 					{
@@ -23,7 +22,7 @@
 				],
 				"description":"all users in org exclude public"
 			},
-			{
+			"public":{
 				"name":"public",
 				"permissions":[
 					{
@@ -32,21 +31,21 @@
 				],
 				"description":"public users in org"
 			}
-		],
-		"operations":[],
-		"orgs":[
-			{
-				"name":"finance",
-				"type":"department.finance"
-			},
-			{
-				"name":"hr",
+		},
+		"operations":{},
+		"orgs":{
+			"department.hr":{
+				"name":"human resource",
 				"type":"department.hr"
 			},
-			{
-				"name":"service",
+			"department.project":{
+				"name":"project department",
+				"type":"department.project"
+			},
+			"department.service":{
+				"name":"service department",
 				"type":"department.service"
 			}
-		]
+		}
 	}
 }
