@@ -34,6 +34,6 @@ module.exports = async function (context, options = {}) {
 
   context.result = operationList;
 
-  return context;
+  return operationList;
 };
 

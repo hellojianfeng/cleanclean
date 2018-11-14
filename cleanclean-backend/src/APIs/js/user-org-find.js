@@ -21,6 +21,6 @@ module.exports = async function (context) {
 
   context.result = orgList;
 
-  return context;
+  return context.result;
 };
 

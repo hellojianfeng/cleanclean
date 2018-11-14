@@ -17,7 +17,7 @@ module.exports = async function (context, options = {}) {
   let role = null;
 
   if (options.role_id && options.role_id instanceof mongooseClient.Types.ObjectId){
-    role = await roleService.get(options.role_id)
+    role = await roleService.get(options.role_id);
   } else {
     context.result = {};
     return context;
@@ -41,6 +41,6 @@ module.exports = async function (context, options = {}) {
 
   context.result = operationList;
 
-  return context;
+  return context.result;
 };
 

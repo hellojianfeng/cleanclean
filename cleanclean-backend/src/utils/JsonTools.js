@@ -7,7 +7,12 @@ return module.exports = {
     if (!fs.existsSync(startPath.replace('..','src')+'/'+jsonFile)){
       return nestedJson.reverse();
     }
-    const startJson = require(startPath + '/' + jsonFile);
+    const fileName = startPath + '/' + jsonFile;
+    const resolvePath = require.resolve(fileName);
+    if(require.cache[resolvePath]){
+      delete require.cache[resolvePath];
+    }
+    const startJson = require(fileName);
 
     nestedJson.push(startJson);
 

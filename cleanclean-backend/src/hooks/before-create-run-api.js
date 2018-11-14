@@ -47,7 +47,8 @@ module.exports = function (options = {}) {
 
     //if not define permission for api, by default find and get is always allowed to access
     if(!jsonPermissions[apiName] && ['find','get'].includes(method) ){
-      return await apiMethod(context, options);
+      await apiMethod(context, options);
+      return context;
     }
 
     let isAllowed = false;
@@ -79,6 +80,8 @@ module.exports = function (options = {}) {
     //reset context result
     context.result = null;
 
-    return await apiMethod(context, options);
+    await apiMethod(context, options);
+
+    return context;
   };
 };

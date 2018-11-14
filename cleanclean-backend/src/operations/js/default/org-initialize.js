@@ -160,11 +160,12 @@ const orgInitialize = async function (context, options = {}) {
 
   //add sub-orgs
   if(runData.orgs && !Array.isArray(runData.orgs) && typeof runData.orgs === 'object'){
-    for(const key in runData.orgs){
-      const value = runData.orgs[key];
-      value.path = org.path + '#' + key;
+    const orgsData = Object.assign({},runData.orgs);
+    for(const key in orgsData){
+      const value = orgsData[key];
+      value.path = value.path ? org.path + '#' + value.path : org.path + '#' + key;
     }
-    const orgs = Object.values(runData.orgs);
+    const orgs = Object.values(orgsData);
 
     if (orgs.length > 0) {
       await orgService.create(orgs, context.params);
@@ -238,6 +239,9 @@ const orgInitialize = async function (context, options = {}) {
   await userService.patch(context.params.user._id, {
     current_org: orgId
   });
+
+  //should add record for this operation
+  delete context.result;
 
   return context;
 };

@@ -32,6 +32,6 @@ module.exports = async function (context, options = {}) {
   
   context.result = roleList;
 
-  return context;
+  return context.result;
 };
 

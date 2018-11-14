@@ -2,7 +2,7 @@
 /**
  * options format: { operation1: { operation: operation1, roles: []}}
  */
-module.exports = async function (context, options = {}, returnContext = true) {
+module.exports = async function (context, options = {}) {
 
   //const mongooseClient = context.app.get('mongooseClient');
 
@@ -85,9 +85,7 @@ module.exports = async function (context, options = {}, returnContext = true) {
     }
   }
 
-  if (returnContext){
-    return context;
-  }
+  context.result = roleList;
 
   return roleList;
 };

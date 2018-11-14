@@ -3,7 +3,7 @@
  * options format 1: { operation1: { operation: operation, roles: [ {},...]}}
  * options format 2: [ { operation: operation, roles: [ {},...]}]
  */
-module.exports = async function (context, options = {}, returnContext = true) {
+module.exports = async function (context, options = {}) {
 
   //const mongooseClient = context.app.get('mongooseClient');
 
@@ -89,9 +89,7 @@ module.exports = async function (context, options = {}, returnContext = true) {
     }
   }
 
-  if (returnContext){
-    return context;
-  }
+  context.result = permissionList;
 
   return permissionList;
 };

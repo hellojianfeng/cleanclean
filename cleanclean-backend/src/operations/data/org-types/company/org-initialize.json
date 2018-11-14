@@ -55,6 +55,7 @@
 		"orgs":{
 			"department.system":{
 				"name":"system department",
+				"path":"system",
 				"type":"company.department.system"
 			}
 		}

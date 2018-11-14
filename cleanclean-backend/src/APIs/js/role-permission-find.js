@@ -33,6 +33,6 @@ module.exports = async function (context, options = {}) {
 
   context.result = permissionList;
 
-  return context;
+  return context.result;
 };
 
