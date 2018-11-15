@@ -1,24 +1,36 @@
 
 /**
- * this function use to find all user's orgs
- * parameters:
- * data: it is data from create run-api
- * return: 
- * org list with user's roles
+
  */
+const userOrgFind = require('../../APIs/js/user-org-find');
 module.exports = async function (context, options = {}) {
+
+  const pageData = context.data.data;
+  const pageName = context.data.page;
+  const action = context.data.action || 'open';
 
   const mongooseClient = context.app.get('mongooseClient');
 
   const user = context.params.user;
 
-  const result = {
-    title: 'User Home'
-  };
+  if (action === 'open'){
+    const orgs = await userOrgFind(context);
+    const orgList = Object.values(orgs);
 
-  
-  context.result = result;
+    const result = {
+      page: pageName,
+      action: action,
+      user: user,
+      orgs: orgList
+    };
 
-  return context.result;
+    context.result = result;
+
+    //remove user's current org
+    const userService = context.app.service('users');
+    await userService.patch(user._id, { current_org: null });
+  }
+
+  return context;
 };
 
