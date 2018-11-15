@@ -1,0 +1,19 @@
+{
+    "page-permission-example": {
+        "roles": {
+            "path1":{
+                "path": "path1",
+                "include": {
+                    "children": {
+                        "recursive": true
+                    }
+                }
+            }
+        },
+        "permissions": {
+            "path1":{
+                "path": "path1"
+            }
+        }
+    }
+}
