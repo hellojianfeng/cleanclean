@@ -20,8 +20,10 @@ module.exports = async function (context, options = {}) {
     const result = {
       page: pageName,
       action: action,
-      user: user,
-      orgs: orgList
+      data: {
+        user: user,
+        orgs: orgList
+      }
     };
 
     context.result = result;

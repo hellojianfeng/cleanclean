@@ -16,7 +16,11 @@ module.exports = function (options = {}) {
 
     const jsonPagePermissions = require('../pages/data/page-permission.json');
 
-    const pageName = context.data.page;
+    let pageName = context.data.name;
+
+    if (!context.data.name && context.data.page){
+      pageName = context.data.name = context.data.page;
+    }
 
     const jsPageFile = '../pages/js/'+pageName +'.js';
 
