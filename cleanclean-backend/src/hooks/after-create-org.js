@@ -27,6 +27,11 @@ module.exports = function (options = {}) {
         name: 'org-initialize',
         org: o._id,
       });
+      //add default org-home operation
+      const orgHome = await operationService.create({
+        name: 'org-home',
+        org: o._id,
+      });
       const administrators = await permissionService.create(
         {
           name: 'administrators',
@@ -35,6 +40,10 @@ module.exports = function (options = {}) {
             {
               oid: orgInitialize._id,
               path: orgInitialize.path
+            },
+            {
+              oid: orgHome._id,
+              path: orgHome.path
             }
           ]
         },

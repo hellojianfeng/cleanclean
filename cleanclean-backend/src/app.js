@@ -48,12 +48,12 @@ app.configure(authentication);
 
 //Config swagger
 app.configure(swagger({
-    docsPath: '/docs',
-    uiIndex: true,
-    info: {
-        title: 'CleanClean API Document',
-        description: 'CleanClean API Document'
-    }
+  docsPath: '/docs',
+  uiIndex: true,
+  info: {
+    title: 'CleanClean API Document',
+    description: 'CleanClean API Document'
+  }
 }));
 
 // Set up our services (see `services/index.js`)

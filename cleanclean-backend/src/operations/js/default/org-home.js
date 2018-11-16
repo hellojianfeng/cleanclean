@@ -11,8 +11,6 @@ module.exports = async function (context, options = {}) {
 
   const user = context.params.user;
 
-  const runOperation = context.app.service('run-operation');
-
   const result = {
     page: operationName,
     stage,
@@ -42,21 +40,6 @@ module.exports = async function (context, options = {}) {
   }
   const userService = context.app.service('users');
   await userService.patch(user._id, { current_org: orgId });
-
-  //check org initialized
-  const isInitialized = await runOperation.create(
-    {
-      'operation':'org-initialize',
-      'stage':'check'
-    }, context.params
-  );
-
-  if (!isInitialized){
-    result.data.org_is_initialized = false;
-    result.data.message = 'org is not initialized, please initialize it first!';
-    context.result = result;
-    return context;
-  }
 
   if (stage === 'start'){
 
