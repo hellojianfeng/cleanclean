@@ -17,6 +17,40 @@ const orgInitialize = async function (context, options = {}) {
 
   let stage = context.data.stage || 'start';
 
+  let isInitialized = false;
+
+  const checkInitialize = async function(){
+    const runService = context.app.service('run-operation');
+    const findResult = await runService.find({
+      query: {
+        operation: {
+          oid: operation._id
+        }
+      }
+    });
+    if (findResult.total > 0){
+      return true;
+    }
+    return false;
+  };
+
+  isInitialized = await checkInitialize();
+  if(isInitialized){
+    context.result = {
+      is_initialized: isInitialized,
+      message: 'org is initialized, please do not initialize it again!'
+    };
+    return context;
+  } else {
+    if (stage === 'check'){
+      context.result = {
+        is_initialized: isInitialized,
+        message: 'org is not initialized, please initialize it first!'
+      };
+      return context;
+    }
+  }
+
   if (stage === 'start'){
     context.result = runData;
     return context;

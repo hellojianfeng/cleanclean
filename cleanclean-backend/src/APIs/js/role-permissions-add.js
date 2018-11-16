@@ -45,11 +45,11 @@ module.exports = async function (context, options = {}) {
       }
     }
 
-    if (typeof item.role instanceof 'object' && item.role._id){
+    if (typeof item.role === 'object' && item.role._id){
       role = item.role;
     }
 
-    if (!role || !role._id || role.path){
+    if (!role || !role._id || !role.path){
       break;
     }
 

@@ -3,13 +3,13 @@
 
  */
 const userOrgFind = require('../../APIs/js/user-org-find');
-module.exports = async function (context, options = {}) {
+module.exports = async function (context) {
 
-  const pageData = context.data.data;
+  //const pageData = context.data.data;
   const pageName = context.data.page;
   const action = context.data.action || 'open';
 
-  const mongooseClient = context.app.get('mongooseClient');
+  //const mongooseClient = context.app.get('mongooseClient');
 
   const user = context.params.user;
 

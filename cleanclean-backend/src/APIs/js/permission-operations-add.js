@@ -45,11 +45,11 @@ module.exports = async function (context, options = {}) {
       }
     }
 
-    if (typeof item.permission instanceof 'object' && item.permission._id){
+    if (typeof item.permission === 'object' && item.permission._id){
       permission = item.permission;
     }
 
-    if (!permission || !permission._id || permission.path){
+    if (!permission || !permission._id || !permission.path){
       break;
     }
 
