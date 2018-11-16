@@ -3,10 +3,6 @@
 	"app":"default",
 	"data":{
 		"operations":{
-			"org-home":{
-				"name":"org-home",
-				"permissions":["everyone"]
-			},
 			"org-profile-management":{
 				"name":"org-profile-management",
 				"roles":["admin"]
