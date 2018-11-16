@@ -51,7 +51,7 @@ module.exports = async function (context, options = {}) {
       operation = item.operation;
     }
 
-    if (!operation || !operation._id || operation.path){
+    if (!operation || !operation._id || !operation.path){
       break;
     }
 

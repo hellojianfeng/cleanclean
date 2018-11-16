@@ -3,9 +3,9 @@
 	"app":"default",
 	"data":{
 		"operations":{
-			"user-profile":{
-				"name":"user-profile",
-				"roles":["self"]
+			"org-home":{
+				"name":"org-home",
+				"permissions":["everyone"]
 			},
 			"org-profile-management":{
 				"name":"org-profile-management",

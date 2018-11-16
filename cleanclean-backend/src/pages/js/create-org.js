@@ -2,27 +2,21 @@
 /**
 
  */
-module.exports = async function (context, options = {}) {
+module.exports = async function (context) {
 
   const pageData = context.data.data;
   const pageName = context.data.page || context.data.name;
   const action = context.data.action || 'start';
 
-  const mongooseClient = context.app.get('mongooseClient');
-
-  const user = context.params.user;
-
   const orgTypeService = context.app.service('org-types');
   const orgService = context.app.service('orgs');
-
-  const JsonTools = require('../../utils/JsonTools.js');
 
   if (action === 'start'){
     const findResult = await orgTypeService.find();
     context.result = {
       page: pageName,
       action,
-      result: {
+      data: {
         types: findResult.data
       }
     };
