@@ -1,6 +1,7 @@
 
 const userOperationFind = require('../../../APIs/js/user-operation-find');
 const everyoneOperationFind = require('../../../APIs/js/everyone-operation-find');
+const checkOperationStatus = require('../../../APIs/js/check-operation-status');
 module.exports = async function (context, options = {}) {
 
   const operationData = context.data.data;
@@ -49,6 +50,14 @@ module.exports = async function (context, options = {}) {
     const allOperations = Object.assign(userOperations,everyoneOperations);
     //delete operation for org-home
     delete allOperations['org-home'];
+
+    if (allOperations['org-initialize']){
+      const checkResult = await checkOperationStatus(context,{ operation: allOperations['org-initialize']});
+      if (checkResult && checkResult.isCalled === true)
+      {
+        delete allOperations['org-initialize'];
+      }
+    }
 
     result.data.operations = allOperations;
   
