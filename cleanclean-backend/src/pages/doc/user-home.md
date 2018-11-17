@@ -32,7 +32,7 @@ Each page include some actions, the format to specify action in page is like bel
   ```
 
 user-home page include below actions:
-1. open action (default): this stage is default stage, in this action, this page return user object with all user's orgs, meanwhile it will remove current org for user, return data show like below:
+1. open action (default): this action is default action, in this action, this page return user object with all user's orgs, meanwhile it will remove current org for user, return data show like below:
 
     ```
     {
