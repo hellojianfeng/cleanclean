@@ -101,12 +101,13 @@ org initialize data is caught from serveral source, these source include org typ
 
 Possible post body for this stage:(stage can be ignore for start, if not provide data, it also can get data recursively by above description).
 
-    ```
-      {
-        "operation":"org-initialize",
-        "stage":"end"
-      }
-    ```
+  ```
+    {
+      "operation":"org-initialize",
+      "stage":"initialize",
+      .....
+    }
+  ```
 Possible response data like below:
 
     ```
@@ -214,17 +215,16 @@ Getting up and running is as easy as 1, 2, 3.
 
 1. Make sure use is authenticated before access this API
 2. use POST method to access http(s)://xxxx/run-operation and type POST body like below
-
     ```
       {
         "operation":"org-initialize",
-        "stage":"end"
+        "stage":"initialize",
+        .....
       }
     ```
 3. find response data like below:
 
-  "start" stage:
-
+    "start" stage:
       ```
       {
           "operations": {
@@ -295,7 +295,7 @@ Getting up and running is as easy as 1, 2, 3.
       }
     ```
   "initialize" stage:
-
+    
     ```
       {
         "page": {

@@ -1,7 +1,4 @@
 
-/**
-
- */
 const userOrgFind = require('../../APIs/js/user-org-find');
 module.exports = async function (context) {
 
