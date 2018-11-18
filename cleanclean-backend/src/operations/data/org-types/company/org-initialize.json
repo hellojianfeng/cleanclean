@@ -54,6 +54,22 @@
 				"path":"system",
 				"type":"company.department.system"
 			}
+		},
+		"follows":{
+			"children": {
+				"orgs": "$all_children",
+				"follow": {
+					"roles": ["everyone"],
+					"permissions":["followone"]
+				}
+			},
+			"ancestors": {
+				"orgs": "$all_ancestors",
+				"follow": {
+					"roles": ["everyone"],
+					"permissions":["followone"]
+				}
+			}
 		}
 	}
 }

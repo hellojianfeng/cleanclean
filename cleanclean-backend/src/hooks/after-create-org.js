@@ -56,6 +56,14 @@ module.exports = function (options = {}) {
         }
       );//no need to assign user to this permission
 
+      //followone permission
+      await permissionService.create(
+        {
+          name: 'followone',
+          org: o._id
+        }
+      );//no need to assign user to this permission
+
       //self permission
       await permissionService.create(
         {

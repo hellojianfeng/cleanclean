@@ -206,6 +206,13 @@ const orgInitialize = async function (context, options = {}) {
     }
   }
 
+  //reset current org for user which is changed by add sub org
+  context.params.user.current_org = orgId;
+  const userService = context.app.service('users');
+  await userService.patch(context.params.user._id, {
+    current_org: orgId
+  });
+
   //process post add
   for ( const item of Object.values(postAddRoleOperations)){
     newRoles.map ( o => {
@@ -267,13 +274,7 @@ const orgInitialize = async function (context, options = {}) {
   const addPermissionOperations = require('../../../APIs/js/permission-operations-add');
   await addPermissionOperations(context, postAddPermissionOperations,false);
 
-  //reset current org for user which is changed by add sub org
-  context.params.user.current_org = orgId;
-  const userService = context.app.service('users');
-  await userService.patch(context.params.user._id, {
-    current_org: orgId
-  });
-
+  
   //should add record for this operation
   delete context.result;
 
