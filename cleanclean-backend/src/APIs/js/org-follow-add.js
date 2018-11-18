@@ -28,6 +28,7 @@
  * }
  */
 const JsonTools = require('../../utils/JsonTools.js');
+const _ = require('underscore');
 module.exports = async function (context, options = {}) {
 
   const mongooseClient = context.app.get('mongooseClient');
@@ -37,9 +38,31 @@ module.exports = async function (context, options = {}) {
   const permissionService = context.app.service('permissions');
 
   let org = null;
+  let orgData = null;
 
-  if (options.org && options.org._id && options.org.path){
-    org = options.org;
+  if (context.data.data && context.data.data.org){
+    orgData = context.data.data.org;
+  }
+
+  if (options.org){
+    orgData = context.data.org;
+  }
+
+  if (orgData && typeof orgData === 'object'){
+    if (orgData._id && orgData.path){
+      org = orgData;
+    }
+
+    if(!org && orgData.oid){
+      org = await orgService.get(orgData.oid);
+    }
+
+    if(!org && orgData.path){
+      const finds =  await orgService.find({query: { path: orgData.path }});
+      if (finds.total === 1){
+        org = finds.data[0];
+      }
+    }
   }
   
   if(!org && context && context.params && context.params.user && context.params.user.current_org){
@@ -62,6 +85,53 @@ module.exports = async function (context, options = {}) {
 
   if(!inputFollows){
     throw new Error('no valid input orgs!');
+  }
+
+  const orgFollows = org.follows;
+  const outFollows = [];
+
+  const followNameList = orgFollows.map ( o => {
+    return o.name;
+  });
+
+  for ( const inputFollow of inputFollows){
+    if (!nameList.includes(inputFollow.name)){
+
+    } else {
+      const orgFollow = orgFollows.map ( o => {
+        if (o.name === inputFollow.name){
+          return o;
+        }
+      });
+      const orgList = orgFollow['orgs'].map( org => {
+        return org.org.path;
+      });
+
+      for (const inputFollowOrg of inputFollow['orgs']){
+        if( !orgList.includes(inputFollowOrg.org.path)){
+          
+        } else {
+          const orgFollowOrg = orgFollow.orgs.map ( o => {
+            if ( o.path === inputFollowOrg.path){
+              return o;
+            }
+          });
+          const roleList = orgFollowOrg['follow']['roles'].map( o=> {
+            return o.path;
+          });
+          const permissionList = orgFollowOrg['follow']['permissions'].map( o=> {
+            return o.path;
+          });
+          for (const inputFollowRole of inputFollowOrg['follow']['roles']){
+            if (!roleList.includes(inputFollowRole.path)){
+
+            } else {
+
+            }
+          }
+        }
+      }
+    }
   }
 
   for(const followName of Object.keys(inputFollows)){
