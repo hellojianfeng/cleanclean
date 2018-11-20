@@ -15,14 +15,16 @@ module.exports = function (app) {
     display_name: { type: String },
     description: { type: String },
     path: { type: String, required: true }, // dot sperated string, for example, company1#department1#office1, default is same as name
-    org: { type: Schema.Types.ObjectId, required: true  },
+    org_id: { type: Schema.Types.ObjectId, required: true  },
+    org_path: { type: String, required: true  },
     operations: [ theSchema ],
     data: { type: Schema.Types.Mixed }
   }, {
     timestamps: true
   });
 
-  permissions.index({ path: 1, org: 1 },  { unique: true });
+  permissions.index({ path: 1, org_id: 1 },  { unique: true });
+  permissions.index({ path: 1, org_path: 1 },  { unique: true });
 
   return mongooseClient.model('permissions', permissions);
 };

@@ -46,7 +46,7 @@ module.exports = function (options = {}) {
     const apiMethod = require('../APIs/js/'+apiName);
 
     //if not define permission for api, by default find and get is always allowed to access
-    if(!jsonPermissions[apiName] && ['find','get'].includes(method) ){
+    if(!jsonPermissions[apiName] && ['find','get','parse'].includes(method) ){
       await apiMethod(context, options);
       return context;
     }
@@ -57,21 +57,25 @@ module.exports = function (options = {}) {
 
     const userRoles = context.result;
 
-    jsonApiPermissions.roles.map ( o => {
-      if (userRoles.hasOwnProperty(o.path)){
-        isAllowed = true;
-      }
-    });
+    if(jsonApiPermissions.roles && jsonApiPermissions.roles instanceof Object){
+      Object.values(jsonApiPermissions.roles).map ( o => {
+        if (userRoles.hasOwnProperty(o.path)){
+          isAllowed = true;
+        }
+      });
+    }
 
     await userPermissionFind(context);
 
     const userPermissions = context.result;
 
-    jsonApiPermissions.permissions.map ( o => {
-      if (userPermissions.hasOwnProperty(o.path)){
-        isAllowed = true;
-      }
-    });
+    if(jsonApiPermissions.permissions && jsonApiPermissions.permissions instanceof Object){
+      jsonApiPermissions.permissions.map ( o => {
+        if (userPermissions.hasOwnProperty(o.path)){
+          isAllowed = true;
+        }
+      });
+    }
 
     if (!isAllowed){
       throw new Error('user is not allowed to access api!');

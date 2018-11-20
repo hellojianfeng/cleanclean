@@ -2,9 +2,10 @@
 const userOperationFind = require('../../../APIs/js/user-operation-find');
 const everyoneOperationFind = require('../../../APIs/js/everyone-operation-find');
 const checkOperationStatus = require('../../../APIs/js/check-operation-status');
+const modelsParse = require('../../../APIs/js/models-parse');
 module.exports = async function (context, options = {}) {
 
-  const operationData = context.data.data;
+  const operationData = context.data.data || {};
   const operationName = context.data.operation || context.data.name;
   const stage = context.data.stage || 'start';
 
@@ -18,29 +19,17 @@ module.exports = async function (context, options = {}) {
     data: {}
   };
 
-  let orgId = operationData.org_id? operationData.org_id:null;
+  const {org} = await modelsParse(context);
 
-  if (operationData.org && operationData.org._id){
-    orgId = operationData.org._id;
-  }
-
-  if (operationData.org && operationData.org instanceof mongooseClient.Types.ObjectId){
-    orgId = operationData.org;
-  }
-
-  if (operationData.org && operationData.org.oid && operationData.org.oid instanceof mongooseClient.Types.ObjectId){
-    orgId = operationData.org.oid;
-  }
-
-  if (!orgId) {
+  if (!org) {
     result.data = {
-      error: 'not find org id!'
+      error: 'not find org!'
     };
     context.result = result;
     return context;
   }
   const userService = context.app.service('users');
-  await userService.patch(user._id, { current_org: orgId });
+  await userService.patch(user._id, { current_org: org._id });
 
   if (stage === 'start'){
 

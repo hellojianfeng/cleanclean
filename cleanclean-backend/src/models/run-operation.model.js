@@ -9,6 +9,7 @@ module.exports = function (app) {
   const runOperation = new Schema({
     operation: { 
       oid: { type: Schema.Types.ObjectId },
+      path: String,
       data: { type: Schema.Types.Mixed }
     },
     user: {

@@ -25,17 +25,20 @@ module.exports = function (options = {}) {
       //add default initialize operation for org
       const orgInitialize = await operationService.create({
         name: 'org-initialize',
-        org: o._id,
+        org_id: o._id,
+        org_path: o.path
       });
       //add default org-home operation
       const orgHome = await operationService.create({
         name: 'org-home',
-        org: o._id,
+        org_id: o._id,
+        org_path: o.path
       });
       const administrators = await permissionService.create(
         {
           name: 'administrators',
-          org: o._id,
+          org_id: o._id,
+          org_path: o.path,
           operations: [
             {
               oid: orgInitialize._id,
@@ -52,7 +55,8 @@ module.exports = function (options = {}) {
       await permissionService.create(
         {
           name: 'everyone',
-          org: o._id
+          org_id: o._id,
+          org_path: o.path
         }
       );//no need to assign user to this permission
 
@@ -60,7 +64,8 @@ module.exports = function (options = {}) {
       await permissionService.create(
         {
           name: 'followone',
-          org: o._id
+          org_id: o._id,
+          org_path: o.path
         }
       );//no need to assign user to this permission
 
@@ -68,7 +73,8 @@ module.exports = function (options = {}) {
       await permissionService.create(
         {
           name: 'self',
-          org: o._id
+          org_id: o._id,
+          org_path: o.path
         }
       );//no need to assign user to this permission
 
@@ -81,7 +87,8 @@ module.exports = function (options = {}) {
             path: administrators.path
           }
         ],
-        org: o._id
+        org_id: o._id,
+        org_path: o.path
       });
 
       //add admin to user

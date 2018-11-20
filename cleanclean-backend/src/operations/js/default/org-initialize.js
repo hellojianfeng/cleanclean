@@ -56,8 +56,8 @@ const orgInitialize = async function (context, options = {}) {
     return context;
   }
 
-  if (stage !== 'end'){
-    context.result = { message: 'support stages: start | end'};
+  if (stage !== 'initialize'){
+    context.result = { message: 'support stages: start | initialize'};
   }
 
   //if end stage, run real org initialize
@@ -72,7 +72,7 @@ const orgInitialize = async function (context, options = {}) {
   const runOperations = runData.operations;
   if(runOperations && !Array.isArray(runOperations) && typeof runOperations === 'object'){
     Object.values(runOperations).map( o => {
-      o.org = orgId;
+      o.org = { oid: orgId, path: org.path };
       if(o.roles && Array.isArray(o.roles)){
         o.roles.map ( role => {
           if (postAddRoleOperations.hasOwnProperty(role)){

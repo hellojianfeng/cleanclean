@@ -26,6 +26,7 @@ module.exports = function (options = {}) {
           return typeService.get(typeId).then(function(oType){
             if(oType && oType.id){
               context.data.type.oid = oType.id;
+              context.data.type.path = oType.path;
             }
             return resolve(context);
           });
@@ -40,6 +41,7 @@ module.exports = function (options = {}) {
               type.name = type.path.slice(type.path.lastIndexOf('.')+1);
               return typeService.create(type).then( o => {
                 context.data.type.oid = o._id;
+                context.data.type.path = o.path;
                 return resolve(context);
               });
             }
