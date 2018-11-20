@@ -72,7 +72,9 @@ const orgInitialize = async function (context, options = {}) {
   const runOperations = runData.operations;
   if(runOperations && !Array.isArray(runOperations) && typeof runOperations === 'object'){
     Object.values(runOperations).map( o => {
-      o.org = { oid: orgId, path: org.path };
+      //o.org = { oid: orgId, path: org.path };
+      o.org_id = orgId;
+      o.org_path = org.path;
       if(o.roles && Array.isArray(o.roles)){
         o.roles.map ( role => {
           if (postAddRoleOperations.hasOwnProperty(role)){
@@ -114,7 +116,9 @@ const orgInitialize = async function (context, options = {}) {
   const runPermissions = runData.permissions;
   if( runPermissions && typeof runPermissions === 'object' && !Array.isArray(runPermissions)){
     Object.values(runPermissions).map( o => {
-      o.org = orgId;
+      //o.org = orgId;
+      o.org_id = orgId;
+      o.org_path = org.path;
       if(o.operations && Array.isArray(o.operations)){
         const permitOperations = [];
         o.operations.map( path => {
@@ -155,7 +159,9 @@ const orgInitialize = async function (context, options = {}) {
   let newRoles = [];
   if(runData.roles && !Array.isArray(runData.roles) && typeof runData.roles === 'object'){
     const roles = Object.values(runData.roles).map( o => {
-      o.org = orgId;
+      //o.org = orgId;
+      o.org_id = orgId;
+      o.org_path = org.path;
       if(o.permissions && Array.isArray(o.permissions)){
         const rolePermissions = [];
         o.permissions.map( path => {
