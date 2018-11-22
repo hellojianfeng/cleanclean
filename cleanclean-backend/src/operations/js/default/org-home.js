@@ -6,7 +6,7 @@ const modelsParse = require('../../../APIs/js/models-parse');
 module.exports = async function (context, options = {}) {
 
   const operationData = context.data.data || {};
-  const operationName = context.data.operation || context.data.name;
+  const operation = options.operation;
   const stage = context.data.stage || 'start';
 
   const mongooseClient = context.app.get('mongooseClient');
@@ -14,9 +14,9 @@ module.exports = async function (context, options = {}) {
   const user = context.params.user;
 
   const result = {
-    page: operationName,
+    operation: operation.path,
     stage,
-    data: {}
+    result: {}
   };
 
   const {org} = await modelsParse(context);
@@ -27,6 +27,8 @@ module.exports = async function (context, options = {}) {
     };
     context.result = result;
     return context;
+  }else {
+    result.result.org = org;
   }
   const userService = context.app.service('users');
   await userService.patch(user._id, { current_org: org._id });
@@ -48,7 +50,7 @@ module.exports = async function (context, options = {}) {
       }
     }
 
-    result.data.operations = allOperations;
+    result.result.operations = allOperations;
   
     context.result = result;
   }

@@ -71,7 +71,7 @@ module.exports = async function (context, options = {}) {
   if (current_org && newPermissions.length > 0 && newRoles.length > 0){
     let finded = false;
     current_org.follows.map ( o => {
-      if ( o.oid.equals(org._id) ){
+      if ( o.org.oid.equals(org._id) ){
         finded = true;
         newRoles.map ( nr => {
           if(!_.contains(o.follow.roles, nr))
