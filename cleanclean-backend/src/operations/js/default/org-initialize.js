@@ -56,8 +56,8 @@ const orgInitialize = async function (context, options = {}) {
     return context;
   }
 
-  if (stage !== 'end'){
-    context.result = { message: 'support stages: start | end'};
+  if (stage !== 'initialize'){
+    context.result = { message: 'support stages: start | initialize'};
   }
 
   //if end stage, run real org initialize
@@ -72,7 +72,9 @@ const orgInitialize = async function (context, options = {}) {
   const runOperations = runData.operations;
   if(runOperations && !Array.isArray(runOperations) && typeof runOperations === 'object'){
     Object.values(runOperations).map( o => {
-      o.org = orgId;
+      //o.org = { oid: orgId, path: org.path };
+      o.org_id = orgId;
+      o.org_path = org.path;
       if(o.roles && Array.isArray(o.roles)){
         o.roles.map ( role => {
           if (postAddRoleOperations.hasOwnProperty(role)){
@@ -114,7 +116,9 @@ const orgInitialize = async function (context, options = {}) {
   const runPermissions = runData.permissions;
   if( runPermissions && typeof runPermissions === 'object' && !Array.isArray(runPermissions)){
     Object.values(runPermissions).map( o => {
-      o.org = orgId;
+      //o.org = orgId;
+      o.org_id = orgId;
+      o.org_path = org.path;
       if(o.operations && Array.isArray(o.operations)){
         const permitOperations = [];
         o.operations.map( path => {
@@ -155,7 +159,9 @@ const orgInitialize = async function (context, options = {}) {
   let newRoles = [];
   if(runData.roles && !Array.isArray(runData.roles) && typeof runData.roles === 'object'){
     const roles = Object.values(runData.roles).map( o => {
-      o.org = orgId;
+      //o.org = orgId;
+      o.org_id = orgId;
+      o.org_path = org.path;
       if(o.permissions && Array.isArray(o.permissions)){
         const rolePermissions = [];
         o.permissions.map( path => {
@@ -205,6 +211,13 @@ const orgInitialize = async function (context, options = {}) {
       await orgService.create(orgs, context.params);
     }
   }
+
+  //reset current org for user which is changed by add sub org
+  context.params.user.current_org = orgId;
+  const userService = context.app.service('users');
+  await userService.patch(context.params.user._id, {
+    current_org: orgId
+  });
 
   //process post add
   for ( const item of Object.values(postAddRoleOperations)){
@@ -267,12 +280,67 @@ const orgInitialize = async function (context, options = {}) {
   const addPermissionOperations = require('../../../APIs/js/permission-operations-add');
   await addPermissionOperations(context, postAddPermissionOperations,false);
 
-  //reset current org for user which is changed by add sub org
-  context.params.user.current_org = orgId;
-  const userService = context.app.service('users');
-  await userService.patch(context.params.user._id, {
-    current_org: orgId
-  });
+  //add follows org
+  const orgChildrenFind = require('../../../APIs/js/org-children-find');
+  const orgAncestorFind = require('../../../APIs/js/org-ancestor-find');
+  const modelsParse = require('../../../APIs/js/models-parse');
+  const addOrgFollows = require('../../../APIs/js/org-follows-add');
+  const children = await orgChildrenFind(context,{org});
+  const ancestors = await orgAncestorFind(context,{org});
+  
+  const runFollows = runData.follows;
+  
+  if(runFollows.hasOwnProperty('$all_children')){
+    const follows = [];
+    const permissions = runFollows['$all_children']['follow']['permissions'];
+    const roles = runFollows['$all_children']['follow']['roles'];
+    const tags = runFollows['$all_children']['tags'];
+    for (const child of children)
+    {
+      follows.push(
+        {
+          org: {
+            oid: child._id,
+            path: child.path
+          },
+          tags: tags,
+          follow: {
+            roles, permissions
+          }
+        }
+      )
+    }
+
+    if(follows.length>0){
+      const childrenFollows = await addOrgFollows(context,{follows});
+    }
+  }
+
+  if(runFollows.hasOwnProperty('$all_ancestors')){
+    const follows = [];
+    const permissions = runFollows['$all_ancestors']['follow']['permissions'];
+    const roles = runFollows['$all_ancestors']['follow']['roles'];
+    const tags = runFollows['$all_ancestors']['tags'];
+    for (const anc of ancestors)
+    {
+      follows.push(
+        {
+          org: {
+            oid: anc._id,
+            path: anc.path
+          },
+          tags: tags,
+          follow: {
+            roles, permissions
+          }
+        }
+      )
+    }
+
+    if(follows.length > 0){
+      const ancestorFollows = await addOrgFollows(context,{follows});
+    }
+  }
 
   //should add record for this operation
   delete context.result;

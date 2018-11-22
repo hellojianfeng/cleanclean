@@ -38,7 +38,7 @@ module.exports = function (options = {}) {
     return await operationService.find({
       query: {
         path: operationPath,
-        org: orgId.toString(),
+        org_id: orgId,
         app: appName
       }
     }).then ( async results => {

@@ -23,7 +23,8 @@ module.exports = function (app) {
     tags: { type: String },
     data: { type: Schema.Types.Mixed },
     app: { type: String, default: 'default' },
-    org: { type: Schema.Types.ObjectId, required: true  },
+    org_id: { type: Schema.Types.ObjectId, required: true  },
+    org_path: { type: String, required: true  },
     stages: [ operationStage ],
     concurrent: { 
       allow: { type: Number },
@@ -33,7 +34,8 @@ module.exports = function (app) {
     timestamps: true
   });
 
-  operations.index({ path: 1, org: 1, app: 1 },  { unique: true });
+  operations.index({ path: 1, org_1: 1, app: 1 },  { unique: true });
+  operations.index({ path: 1, org_path: 1, app: 1 },  { unique: true });
 
   return mongooseClient.model('operations', operations);
 };

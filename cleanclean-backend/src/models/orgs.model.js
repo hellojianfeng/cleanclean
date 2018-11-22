@@ -12,6 +12,31 @@ module.exports = function (app) {
     data: { type: Schema.Types.Mixed }
   });
 
+  const followRoleSchema = new Schema({
+    oid: Schema.Types.ObjectId, 
+    path: String,
+    data: { type: Schema.Types.Mixed }
+  });
+
+  const followPermissionSchema = new Schema({
+    oid: Schema.Types.ObjectId, 
+    path: String,
+    data: { type: Schema.Types.Mixed }
+  });
+
+  const followOrgSchema = new Schema({
+    org: { 
+      oid: Schema.Types.ObjectId, 
+      path: String 
+    },
+    tags: [String],
+    follow: {
+      roles: [ followRoleSchema ],
+      permissions:[ followPermissionSchema ]
+    },
+    data: { type: Schema.Types.Mixed }
+  });
+
   const orgs = new Schema({
     name: { type: String },
     display_name: { type: String },
@@ -24,6 +49,7 @@ module.exports = function (app) {
     path: { type: String, unique: true }, // # sperated string, for example, company1#department1#office1, default is same as name
     tags: { type: String },
     profiles: [ orgProfile ],
+    follows: [followOrgSchema],
     data: { type: Schema.Types.Mixed }
   }, {
     timestamps: true
