@@ -56,17 +56,17 @@
 			}
 		},
 		"follows":{
-			"children": {
-				"orgs": "$all_children",
+			"$all_children": {
+				"tags": ["child"],
 				"follow": {
-					"roles": ["everyone"],
+					"roles": ["everybody"],
 					"permissions":["followone"]
 				}
 			},
-			"ancestors": {
-				"orgs": "$all_ancestors",
+			"$all_ancestors": {
+				"tags": ["ancestor"],
 				"follow": {
-					"roles": ["everyone"],
+					"roles": ["everybody"],
 					"permissions":["followone"]
 				}
 			}

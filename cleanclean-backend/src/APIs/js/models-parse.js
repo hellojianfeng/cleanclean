@@ -3,12 +3,12 @@ module.exports = async function (context, options={}) {
 
     let org, operation, role, permission;
 
-    let orgData = options.org || context.data.data && context.data.data.org;
-    let org_id = options.org_id || context.data.data && context.data.data.org_id;
-    let org_path = options.org_path || context.data.data && context.data.data.org_path;
-    let operationData = options.operation || context.data.data && context.data.data.operation;
-    let roleData = options.role || context.data.data && context.data.data.role;
-    let permissionData = options.permission || context.data.data && context.data.data.permission;
+    let orgData = options.org || context && context.data && context.data.data && context.data.data.org;
+    let org_id = options.org_id || context && context.data && context.data.data && context.data.data.org_id;
+    let org_path = options.org_path || context && context.data && context.data.data && context.data.data.org_path;
+    let operationData = options.operation || context && context.data && context.data.data && context.data.data.operation;
+    let roleData = options.role || context && context.data && context.data.data && context.data.data.role;
+    let permissionData = options.permission || context && context.data && context.data.data && context.data.data.permission;
 
     const orgService = context.app.service('orgs');
     const operationService = context.app.service('operations');
@@ -146,7 +146,7 @@ module.exports = async function (context, options={}) {
 
     let current_org;
     if (context && context.params && context.params.user && context.params.user.current_org){
-      current_org = orgService.get(context.params.user.current_org);
+      current_org = await orgService.get(context.params.user.current_org);
     }
   
     return context.result = {org, operation,role, permission, current_org};

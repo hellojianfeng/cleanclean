@@ -280,7 +280,68 @@ const orgInitialize = async function (context, options = {}) {
   const addPermissionOperations = require('../../../APIs/js/permission-operations-add');
   await addPermissionOperations(context, postAddPermissionOperations,false);
 
+  //add follows org
+  const orgChildrenFind = require('../../../APIs/js/org-children-find');
+  const orgAncestorFind = require('../../../APIs/js/org-ancestor-find');
+  const modelsParse = require('../../../APIs/js/models-parse');
+  const addOrgFollows = require('../../../APIs/js/org-follows-add');
+  const children = await orgChildrenFind(context,{org});
+  const ancestors = await orgAncestorFind(context,{org});
   
+  const runFollows = runData.follows;
+  
+  if(runFollows.hasOwnProperty('$all_children')){
+    const follows = [];
+    const permissions = runFollows['$all_children']['follow']['permissions'];
+    const roles = runFollows['$all_children']['follow']['roles'];
+    const tags = runFollows['$all_children']['tags'];
+    for (const child of children)
+    {
+      follows.push(
+        {
+          org: {
+            oid: child._id,
+            path: child.path
+          },
+          tags: tags,
+          follow: {
+            roles, permissions
+          }
+        }
+      )
+    }
+
+    if(follows.length>0){
+      const childrenFollows = await addOrgFollows(context,{follows});
+    }
+  }
+
+  if(runFollows.hasOwnProperty('$all_ancestors')){
+    const follows = [];
+    const permissions = runFollows['$all_ancestors']['follow']['permissions'];
+    const roles = runFollows['$all_ancestors']['follow']['roles'];
+    const tags = runFollows['$all_ancestors']['tags'];
+    for (const anc of ancestors)
+    {
+      follows.push(
+        {
+          org: {
+            oid: anc._id,
+            path: anc.path
+          },
+          tags: tags,
+          follow: {
+            roles, permissions
+          }
+        }
+      )
+    }
+
+    if(follows.length > 0){
+      const ancestorFollows = await addOrgFollows(context,{follows});
+    }
+  }
+
   //should add record for this operation
   delete context.result;
 

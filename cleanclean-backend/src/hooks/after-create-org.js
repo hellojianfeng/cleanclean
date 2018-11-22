@@ -52,7 +52,7 @@ module.exports = function (options = {}) {
         },
       );
       //everyone permission
-      await permissionService.create(
+      const everyonePermission = await permissionService.create(
         {
           name: 'everyone',
           org_id: o._id,
@@ -87,6 +87,13 @@ module.exports = function (options = {}) {
             path: administrators.path
           }
         ],
+        org_id: o._id,
+        org_path: o.path
+      });
+
+      //everybody role, include every person
+      const everybody = await roleService.create({
+        name: 'everybody',
         org_id: o._id,
         org_path: o.path
       });

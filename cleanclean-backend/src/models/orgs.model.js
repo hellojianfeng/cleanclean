@@ -29,16 +29,11 @@ module.exports = function (app) {
       oid: Schema.Types.ObjectId, 
       path: String 
     },
+    tags: [String],
     follow: {
-      rows: [ followRoleSchema ],
+      roles: [ followRoleSchema ],
       permissions:[ followPermissionSchema ]
     },
-    data: { type: Schema.Types.Mixed }
-  });
-
-  const followSchema = new Schema({
-    name: String,
-    orgs: [ followOrgSchema ],
     data: { type: Schema.Types.Mixed }
   });
 
@@ -54,7 +49,7 @@ module.exports = function (app) {
     path: { type: String, unique: true }, // # sperated string, for example, company1#department1#office1, default is same as name
     tags: { type: String },
     profiles: [ orgProfile ],
-    follows: [followSchema],
+    follows: [followOrgSchema],
     data: { type: Schema.Types.Mixed }
   }, {
     timestamps: true
