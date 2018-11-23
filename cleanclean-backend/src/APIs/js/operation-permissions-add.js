@@ -7,24 +7,16 @@ module.exports = async function (context, options = {}) {
 
   //const mongooseClient = context.app.get('mongooseClient');
 
+  const parseModels = require('./models-parse');
+
   const permissionList = [];
 
   const permissionService = context.app.service('permissions');
   const operationService = context.app.service('operations');
 
-  let orgId = context && context.params && context.params.user && context.params.user.current_org ? context.params.user.current_org : null;
+  const { org, current_org } = await parseModels(context,options);
 
-  if (context && context.org){
-    if (context.org._id){
-      orgId = context.org._id;
-    }
-    if (context.org.oid){
-      orgId = context.org.oid;
-    }
-  }
-  if (context && context.orgId){
-    orgId = context.orgId;
-  }
+  let orgId = org && org._id || current_org && current_org._id;
 
   let list = [];
   if (Array.isArray(options)){
@@ -41,7 +33,7 @@ module.exports = async function (context, options = {}) {
       if (!orgId){
         break;
       }
-      const results = await operationService.find ({ query: { path: item.operation, org: orgId }});
+      const results = await operationService.find ({ query: { path: item.operation, org_id: orgId }});
       if (results.total === 1){
         operation = results.data[0];
       }
@@ -55,7 +47,7 @@ module.exports = async function (context, options = {}) {
       break;
     }
 
-    orgId = orgId || operation.org;
+    orgId = orgId || operation.org_id;
 
     for (const p of item.permissions){
       let permission = null;

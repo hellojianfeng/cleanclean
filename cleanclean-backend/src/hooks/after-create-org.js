@@ -111,7 +111,7 @@ module.exports = function (options = {}) {
       //add current user as admin and set current org for user
       await userService.patch(context.params.user._id, {
         roles:roles,
-        current_org: o._id
+        current_org: {oid: o._id, path: o.path }
       });
     }));
 

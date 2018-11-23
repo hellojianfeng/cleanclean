@@ -1,13 +1,17 @@
 
 module.exports = async function (context, options = {}) {
 
-  const orgId = context.params.user.current_org;
+  const parseModels = require('./models-parse');
+
+  const { org, current_org } = await parseModels(context,options);
+
+  const orgId = org && org._id || current_org && current_org._id;
 
   const permissionService = context.app.service('permissions');
 
   const finds = await permissionService.find({
     query: {
-      org: orgId,
+      'org.oid':orgId,
       path: 'everyone'
     }
   });

@@ -11,19 +11,11 @@ module.exports = async function (context, options = {}) {
   const roleService = context.app.service('roles');
   const permissionService = context.app.service('permissions');
 
-  let orgId = context && context.params && context.params.user && context.params.user.current_org ? context.params.user.current_org : null;
+  const parseModels = require('./models-parse');
 
-  if (context && context.org){
-    if (context.org._id){
-      orgId = context.org._id;
-    }
-    if (context.org.oid){
-      orgId = context.org.oid;
-    }
-  }
-  if (context && context.orgId){
-    orgId = context.orgId;
-  }
+  const { org, current_org } = await parseModels(context,options);
+
+  let orgId = org && org._id || current_org && current_org._id;
 
   let list = [];
   if (Array.isArray(options)){
@@ -52,13 +44,13 @@ module.exports = async function (context, options = {}) {
       break;
     }
 
-    orgId = orgId || permission.org;
+    orgId = orgId || permission.org_id;
 
     for (const r of item.roles){
       let role = null;
       if ( typeof r === 'string'){
         if(!orgId) break;
-        const results = await roleService.find({ query: { path: r, org: orgId }});
+        const results = await roleService.find({ query: { path: r, org_id: orgId }});
         if (results.total === 1) {
           role = results.data[0];
         }

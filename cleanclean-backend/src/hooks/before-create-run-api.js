@@ -14,12 +14,12 @@ module.exports = function (options = {}) {
       throw new Error('user is not authenticated!');
     }
 
-    if(!user.current_org){
+    if(!(user.current_org && user.current_org.oid)){
       throw new Error('please provide current org!');
     }
 
     const orgService = context.app.service('orgs');
-    const org = await orgService.get(user.current_org);
+    const org = await orgService.get(user.current_org.oid);
 
     if(!org){
       throw new Error('org is not valid!');

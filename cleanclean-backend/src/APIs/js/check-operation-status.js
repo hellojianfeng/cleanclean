@@ -1,36 +1,14 @@
 
 module.exports = async function (context, options = {}) {
 
+  const parseModels = require('./models-parse');
+
   const runService = context.app.service('run-operation');
   const operationService = context.app.service('operations');
 
   const user = context.params.user;
 
-  let orgId = user.current_org;
-  let operation = null;
-
-  if (options && options.operation){
-
-    const operationData = options.operation;
-
-    orgId = orgId || operationData.orgId;
-
-    if (operationData._id){
-      operation = operationData;
-    } 
-    else if (operationData.path && orgId){
-      await operationService.find({
-        query: {
-          path: operationData.path,
-          org: orgId
-        }
-      }).then (results => {
-        if (results.total === 1) {
-          operation = results.data[0];
-        }
-      });
-    }
-  }
+  const { operation, current_org } = await parseModels(context,options);
 
   if (!operation || !operation._id){
     throw new Error('please provide operation id!');

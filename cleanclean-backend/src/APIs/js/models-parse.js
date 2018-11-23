@@ -145,8 +145,8 @@ module.exports = async function (context, options={}) {
     }
 
     let current_org;
-    if (context && context.params && context.params.user && context.params.user.current_org){
-      current_org = await orgService.get(context.params.user.current_org);
+    if (context && context.params && context.params.user && context.params.user.current_org && context.params.user.current_org.oid){
+      current_org = await orgService.get(context.params.user.current_org.oid);
     }
   
     return context.result = {org, operation,role, permission, current_org};
