@@ -12,19 +12,11 @@ module.exports = async function (context, options = {}) {
   const roleService = context.app.service('roles');
   const operationService = context.app.service('operations');
 
-  let orgId = context && context.params && context.params.user && context.params.user.current_org ? context.params.user.current_org : null;
+  const parseModels = require('./models-parse');
 
-  if (context && context.org){
-    if (context.org._id){
-      orgId = context.org._id;
-    }
-    if (context.org.oid){
-      orgId = context.org.oid;
-    }
-  }
-  if (context && context.orgId){
-    orgId = context.orgId;
-  }
+  const { org, current_org } = await parseModels(context,options);
+
+  let orgId = org && org._id || current_org && current_org._id;
 
   let list = [];
   if (Array.isArray(options)){
@@ -53,13 +45,13 @@ module.exports = async function (context, options = {}) {
       break;
     }
 
-    orgId = orgId || role.org;
+    orgId = orgId || role.org_id;
 
     for (const o of item.operations){
       let operation = null;
       if ( typeof o === 'string'){
         if (!orgId) break;
-        const results = await operationService.find({ query: { path: o, org: orgId }});
+        const results = await operationService.find({ query: { path: o, org_id: orgId }});
         if (results.total === 1) {
           operation = results.data[0];
         }

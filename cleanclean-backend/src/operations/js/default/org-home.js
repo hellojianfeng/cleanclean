@@ -31,7 +31,7 @@ module.exports = async function (context, options = {}) {
     result.result.org = org;
   }
   const userService = context.app.service('users');
-  await userService.patch(user._id, { current_org: org._id });
+  await userService.patch(user._id, { current_org: {oid: org._id, path: org.path}});
 
   if (stage === 'start'){
 

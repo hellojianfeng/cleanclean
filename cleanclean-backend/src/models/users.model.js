@@ -34,7 +34,16 @@ module.exports = function (app) {
     roles: [ theSchema ],
     permissions: [ theSchema ],
     operations: [ theSchema ],
-    current_org: { type: Schema.Types.ObjectId },
+    current_org: {
+      oid: { type: Schema.Types.ObjectId },
+      path: String,
+      data: { type: Schema.Types.Mixed }
+    },
+    follow_org: {
+      oid: { type: Schema.Types.ObjectId },
+      path: String,
+      data: { type: Schema.Types.Mixed }
+    },
     data: {type: Schema.Types.Mixed}
   }, {
     timestamps: true

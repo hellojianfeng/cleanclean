@@ -13,9 +13,12 @@ module.exports = function (options = {}) {
 
     //get operation first
     const operationPath = context.data.operation;
-    const orgId = user.current_org;
-    const org = await orgService.get(orgId);
+    const parseModels = require('../APIs/js/models-parse');
+    let { org, current_org } = await parseModels(context,options);
+    let orgId = org && org._id || current_org && current_org._id;
     let appName = 'default';
+
+    org = org || current_org;
 
     let orgType = null;
 
@@ -64,7 +67,7 @@ module.exports = function (options = {}) {
 
       const finds = await permissionService.find({
         query: {
-          org: operation.org,
+          org_id: operation.org_id,
           path: 'everyone'
         }
       });
@@ -78,9 +81,9 @@ module.exports = function (options = {}) {
       });
 
       const tempContext = Object.assign({},context);
-      await userOperationFind(tempContext);
+      const oUserOperations = await userOperationFind(tempContext);
 
-      const userOperations = Object.values(tempContext.result);
+      const userOperations = Object.values(oUserOperations);
 
       userOperations.map ( o => {
         if (operation._id.equals(o._id)){

@@ -12,11 +12,11 @@ module.exports = async function (context, options = {}) {
 
   const user = context.params.user;
 
-  let orgId = user.current_org;
+  const parseModels = require('./models-parse');
 
-  if ( options.org_id && options.org_id instanceof mongooseClient.Types.ObjectId){
-    orgId = options.org_id;
-  }
+  const { org, current_org } = await parseModels(context,options);
+
+  let orgId = org && org._id || current_org && current_org._id;
 
   const roleService = context.app.service('roles');
 

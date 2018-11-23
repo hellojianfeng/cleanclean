@@ -7,7 +7,7 @@ const orgInitialize = async function (context, options = {}) {
 
   const user = context.params.user;
 
-  const orgId = user.current_org;
+  const orgId = user.current_org && user.current_org.oid;
 
   const operation = options.operation;
 
@@ -213,10 +213,10 @@ const orgInitialize = async function (context, options = {}) {
   }
 
   //reset current org for user which is changed by add sub org
-  context.params.user.current_org = orgId;
+  context.params.user.current_org = {oid: orgId, path: org.path};
   const userService = context.app.service('users');
   await userService.patch(context.params.user._id, {
-    current_org: orgId
+    current_org: {oid: orgId, path: org.path}
   });
 
   //process post add

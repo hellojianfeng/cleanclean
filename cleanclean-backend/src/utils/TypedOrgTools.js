@@ -8,11 +8,11 @@ return module.exports = {
 
         const user = context.params.user;
 
-        if(!(user && user.current_org || org)){
+        if(!(user && user.current_org && user.current_org.oid || org)){
             return null;
         }
 
-        let org = org || user.current_org;
+        let org = org || user.current_org && user.current_org.oid;
 
         if (org instanceof Schema.Types.ObjectId){
             org = await orgService.get(org);
