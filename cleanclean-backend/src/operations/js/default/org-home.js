@@ -5,11 +5,11 @@ const checkOperationStatus = require('../../../APIs/js/check-operation-status');
 const modelsParse = require('../../../APIs/js/models-parse');
 module.exports = async function (context, options = {}) {
 
-  const operationData = context.data.data || {};
+  //const operationData = context.data.data || {};
   const operation = options.operation;
   const stage = context.data.stage || 'start';
 
-  const mongooseClient = context.app.get('mongooseClient');
+  //const mongooseClient = context.app.get('mongooseClient');
 
   const user = context.params.user;
 
