@@ -9,15 +9,14 @@
  *    }
  *  }
  */
-const JsonTools = require('../../utils/JsonTools.js');
 const _ = require('underscore');
 module.exports = async function (context, options = {}) {
 
-  const mongooseClient = context.app.get('mongooseClient');
+  //const mongooseClient = context.app.get('mongooseClient');
 
   const orgService = context.app.service('orgs');
-  const roleService = context.app.service('roles');
-  const permissionService = context.app.service('permissions');
+  //const roleService = context.app.service('roles');
+  //const permissionService = context.app.service('permissions');
 
   const modelsParse = require('./models-parse');
 
@@ -27,9 +26,9 @@ module.exports = async function (context, options = {}) {
 
   const newRoles = [];
   if (followData && followData.follow && followData.follow.roles){
-    for ( r of followData.follow.roles){
+    for ( const r of followData.follow.roles){
       if (typeof r === 'object' && r.oid && r.path){
-        newRoles.push(p);
+        newRoles.push(r);
         continue;
       }
       let role;
@@ -48,7 +47,7 @@ module.exports = async function (context, options = {}) {
 
   const newPermissions = [];
   if (followData && followData.follow && followData.follow.permissions){
-    for ( p of followData.follow.permissions){
+    for ( const p of followData.follow.permissions){
       if (typeof p === 'object' && p.oid && p.path){
         newPermissions.push(p);
         continue;
@@ -59,7 +58,7 @@ module.exports = async function (context, options = {}) {
         permission = models.permission;
       }
       if (typeof p === 'object' && p._id && p.path){
-        permission = p
+        permission = p;
       }
       if(permission && permission._id && permission.path){
         newPermissions.push({oid: permission._id, path: permission.path});
@@ -86,12 +85,12 @@ module.exports = async function (context, options = {}) {
             o.follow.permissions.push(np);
             changed = true;
           }
-        })
+        });
         followData.tags.map ( t => {
           if (!o.tags.include(t)){
             o.tags.push(t);
           }
-        })
+        });
       }
       return o;
     });

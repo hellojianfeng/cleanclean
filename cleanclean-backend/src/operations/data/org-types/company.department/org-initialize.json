@@ -14,8 +14,14 @@
 		"operations":{
 			
 		},
-		"orgs":{
-		
+		"follows":{
+			"$all_ancestors": {
+				"tags": ["ancestor"],
+				"follow": {
+					"roles": ["everybody"],
+					"permissions":["followone"]
+				}
+			}
 		}
 	}
 }

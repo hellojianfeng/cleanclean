@@ -283,14 +283,14 @@ const orgInitialize = async function (context, options = {}) {
   //add follows org
   const orgChildrenFind = require('../../../APIs/js/org-children-find');
   const orgAncestorFind = require('../../../APIs/js/org-ancestor-find');
-  const modelsParse = require('../../../APIs/js/models-parse');
+  //const modelsParse = require('../../../APIs/js/models-parse');
   const addOrgFollows = require('../../../APIs/js/org-follows-add');
   const children = await orgChildrenFind(context,{org});
   const ancestors = await orgAncestorFind(context,{org});
   
   const runFollows = runData.follows;
   
-  if(runFollows.hasOwnProperty('$all_children')){
+  if(runFollows && runFollows.hasOwnProperty('$all_children')){
     const follows = [];
     const permissions = runFollows['$all_children']['follow']['permissions'];
     const roles = runFollows['$all_children']['follow']['roles'];
@@ -308,7 +308,7 @@ const orgInitialize = async function (context, options = {}) {
             roles, permissions
           }
         }
-      )
+      );
     }
 
     if(follows.length>0){
@@ -316,7 +316,7 @@ const orgInitialize = async function (context, options = {}) {
     }
   }
 
-  if(runFollows.hasOwnProperty('$all_ancestors')){
+  if(runFollows && runFollows.hasOwnProperty('$all_ancestors')){
     const follows = [];
     const permissions = runFollows['$all_ancestors']['follow']['permissions'];
     const roles = runFollows['$all_ancestors']['follow']['roles'];
@@ -334,7 +334,7 @@ const orgInitialize = async function (context, options = {}) {
             roles, permissions
           }
         }
-      )
+      );
     }
 
     if(follows.length > 0){

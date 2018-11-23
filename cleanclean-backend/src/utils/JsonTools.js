@@ -4,9 +4,11 @@ return module.exports = {
     
   getJsonsFromPathFiles: function(startPath, jsonFile, seperator = '.', nestedJson = []){
 
-    if (!fs.existsSync(startPath.replace('..','src')+'/'+jsonFile)){
-      const nextPath = startPath.slice(0,startPath.lastIndexOf(seperator));
-      if(startPath !== nextPath){
+    const realPath = startPath.replace('..','src');
+    const nextPath = startPath.slice(0,startPath.lastIndexOf(seperator));
+    const realPath2 = realPath.slice(0,realPath.lastIndexOf(seperator));
+    if (!fs.existsSync(realPath+'/'+jsonFile)){
+      if(realPath !== realPath2){
         return this.getJsonsFromPathFiles(nextPath, jsonFile, seperator, nestedJson);
       } else {
         return nestedJson.reverse();
@@ -22,9 +24,8 @@ return module.exports = {
     nestedJson.push(startJson);
 
     if (startJson.merge_parent) {
-      const startPath2 = startPath.slice(0,startPath.lastIndexOf(seperator));
-      if (startPath !== startPath2){
-        nestedJson = this.getJsonsFromPathFiles(startPath2, jsonFile, seperator, nestedJson);
+      if (realPath !== realPath2){
+        nestedJson = this.getJsonsFromPathFiles(nextPath, jsonFile, seperator, nestedJson);
       } else {
         return nestedJson.reverse();
       }
