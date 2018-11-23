@@ -10,11 +10,6 @@
 			}
 		},
 		"roles": {
-			"department_member":{
-				"name":"department_member",
-				"permissions":["department_member"],
-				"description":"department member role"
-			}
 		},
 		"operations":{
 			

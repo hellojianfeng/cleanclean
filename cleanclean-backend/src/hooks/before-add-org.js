@@ -7,48 +7,47 @@ module.exports = function (options = {}) {
     const typeService = context.app.service('org-types');
 
     //add type for org
-    if(context.data.type){
+    let orgs = [];
+    if(!Array.isArray(context.data)){
+      orgs.push(context.data);
+    } else {
+      orgs = orgs.concat(context.data);
+    }
+    for ( const org of orgs){
+      if(org.type){
+        let type = {};
+        if(typeof org.type === 'string'){
+          const path = org.type;
+          type = { 
+            path: path 
+          };
+          org.type = {};
+        }
+  
+        const typeId = type._id || type.id || type.oid;
 
-      let type = {};
-
-      if(typeof context.data.type === 'string'){
-        const path = context.data.type;
-        type = { 
-          path: path 
-        };
-        context.data.type = {};
-      }
-
-      const typeId = type._id || type.id || type.oid;
-
-      return new Promise(function(resolve){
-        if( typeId ){
-          return typeService.get(typeId).then(function(oType){
-            if(oType && oType.id){
-              context.data.type.oid = oType.id;
-              context.data.type.path = oType.path;
-            }
-            return resolve(context);
-          });
+        if(typeId){
+          const oType = await typeService.get(typeId);
+          org.type.oid = oType.id;
+          org.type.path = oType.path;
         }
 
         if(type.path){
-          return typeService.find({query:{path:type.path}}).then(function(oTypes){
-            if(oTypes && oTypes.total > 0){
-              context.data.type.oid = oTypes.data[0]._id;
-              return resolve(context);
-            } else {
-              type.name = type.path.slice(type.path.lastIndexOf('.')+1);
-              return typeService.create(type).then( o => {
-                context.data.type.oid = o._id;
-                context.data.type.path = o.path;
-                return resolve(context);
-              });
-            }
-          });
+          const finds = await typeService.find({query:{path:type.path}});
+          if(finds && finds.total > 0){
+            org.type.oid = finds.data[0]._id;
+            org.type.path = finds.data[0].path;
+          } else {
+            type.name = type.path.slice(type.path.lastIndexOf('.')+1);
+            await typeService.create(type).then( o => {
+              org.type.oid = o._id;
+              org.type.path = o.path;
+            });
+          }
         }
-      });
+      }
     }
+    
     return context;
   };
 };

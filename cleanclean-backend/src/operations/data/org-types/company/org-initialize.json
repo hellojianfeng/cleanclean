@@ -57,7 +57,7 @@
 		},
 		"follows":{
 			"$all_children": {
-				"tags": ["child"],
+				"tags": ["children"],
 				"follow": {
 					"roles": ["everybody"],
 					"permissions":["followone"]

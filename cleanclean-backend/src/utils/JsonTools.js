@@ -5,7 +5,12 @@ return module.exports = {
   getJsonsFromPathFiles: function(startPath, jsonFile, seperator = '.', nestedJson = []){
 
     if (!fs.existsSync(startPath.replace('..','src')+'/'+jsonFile)){
-      return nestedJson.reverse();
+      const nextPath = startPath.slice(0,startPath.lastIndexOf(seperator));
+      if(startPath !== nextPath){
+        return this.getJsonsFromPathFiles(nextPath, jsonFile, seperator, nestedJson);
+      } else {
+        return nestedJson.reverse();
+      }
     }
     const fileName = startPath + '/' + jsonFile;
     const resolvePath = require.resolve(fileName);
@@ -20,6 +25,8 @@ return module.exports = {
       const startPath2 = startPath.slice(0,startPath.lastIndexOf(seperator));
       if (startPath !== startPath2){
         nestedJson = this.getJsonsFromPathFiles(startPath2, jsonFile, seperator, nestedJson);
+      } else {
+        return nestedJson.reverse();
       }
     }
 
@@ -62,7 +69,7 @@ return module.exports = {
 
   mergeObjectInArray: function(args, depth = 1){
     let lastObj = {};
-    args.map( o => {
+    args.map(o => {
       lastObj = this.mergeObject(lastObj,o,depth);
     });
     return lastObj;
