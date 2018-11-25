@@ -8,17 +8,54 @@ module.exports = function (options = {}) {
 
     const operationService = context.app.service('operations');
     const orgService = context.app.service('orgs');
+    const userService = context.app.service('users');
     const orgTypeService = context.app.service('org-types');
     const user = context.params.user;
 
     //get operation first
     const operationPath = context.data.operation;
-    const parseModels = require('../APIs/js/models-parse');
-    let { org, current_org } = await parseModels(context,options);
-    let orgId = org && org._id || current_org && current_org._id;
-    let appName = 'default';
 
-    org = org || current_org;
+    if(!operationPath){
+      throw new Error('must provide operation path!');
+    }
+
+    const operationData = context.data.data || {};
+    //const parseModels = require('../APIs/js/models-parse');
+    //let { org, current_org } = await parseModels(context,options);
+    let org = user.current_org;
+    if (operationPath === 'org-home' || operationPath === 'follow-home'){
+      if (operationData && operationData.org){
+        const orgData = operationData.org;
+        let orgPath;
+        if (typeof orgData === 'object'){
+          if(orgData.oid){
+            org = await orgService.get(orgData.oid);
+          }
+          if(orgData.path){
+            orgPath = orgData.path;
+          }
+        }
+        if (typeof orgData === 'string'){
+          orgPath = orgData;
+        }
+        if (!org && orgPath){
+          const finds = await orgService.find({query:{path:orgPath}});
+          if(finds.total === 1){
+            org = finds.data[0];
+          }
+        }
+      }
+    }
+
+    if (org && org.oid && !org._id){
+      org = await orgService.get(org.oid);
+    }
+
+    if(!org){
+      throw new Error('not find current org for user!');
+    }
+    
+    let appName = 'default';
 
     let orgType = null;
 
@@ -30,18 +67,10 @@ module.exports = function (options = {}) {
       appName = context.data.app;
     }
 
-    if(!operationPath){
-      throw new Error('must provide operation path!');
-    }
-
-    if(!orgId){
-      throw new Error('not find current org for user!');
-    }
-
     return await operationService.find({
       query: {
         path: operationPath,
-        org_id: orgId,
+        org_id: org._id,
         app: appName
       }
     }).then ( async results => {
@@ -54,8 +83,24 @@ module.exports = function (options = {}) {
 
       const operation = results.data[0];
 
+      if (operation.path === 'org-home'){
+        await userService.patch(user._id, {
+          current_org: { oid: operation.org_id, path: operation.org_path },
+          follow_org: null
+        });
+        context.params.user.current_org = { oid: operation.org_id, path: operation.org_path };
+        context.params.user.follow_org = null;
+      }
+
+      if (operation.path === 'follow-home'){
+        await userService.patch(user._id, {follow_org: { oid: operation.org_id, path: operation.org_path }});
+        context.params.user.follow_org = { oid: operation.org_id, path: operation.org_path };
+      }
+
+      //set context data for add run-operation record if needed
       context.data.operation = {
-        oid: operation._id
+        oid: operation._id,
+        path: operation.path
       };
       context.data.user = {
         oid: user._id
@@ -63,40 +108,46 @@ module.exports = function (options = {}) {
 
       let isAllowOperation = false;
 
-      const permissionService = context.app.service('permissions');
+      const contextParse = require('../APIs/js/context-parse');
 
-      const finds = await permissionService.find({
-        query: {
-          org_id: operation.org_id,
-          path: 'everyone'
-        }
-      });
+      //set active operation
+      contextParse.operation = operation;
 
-      const everyoneOperations = finds.total === 1 ? finds.data[0]['operations'] : [];
+      const parsedContext =await contextParse(context,options);
+      const user_operations = await parsedContext.user_operations;
 
-      everyoneOperations.map ( o => {
+      const { everyone_operations, everybody_operations, user_follow_operations } = await contextParse(context,options);
+  
+      everyone_operations.map ( o => {
         if ( o.oid.equals(operation._id)){
           isAllowOperation = true;
         }
       });
 
-      const tempContext = Object.assign({},context);
-      const oUserOperations = await userOperationFind(tempContext);
+      everybody_operations.map ( o => {
+        if ( o.oid.equals(operation._id)){
+          isAllowOperation = true;
+        }
+      });
 
-      const userOperations = Object.values(oUserOperations);
-
-      userOperations.map ( o => {
+      user_operations.map ( o => {
         if (operation._id.equals(o._id)){
           isAllowOperation = true;
         }
       });
+
+      for (const followOperation of user_follow_operations){
+        if (followOperation.oid.equals(operation._id)){
+          isAllowOperation = true;
+        }
+      }
 
       if(isAllowOperation === false){
         throw new Error('user is not allowed to run operation! operation = '+operationPath);
       }
 
       const processData = context.data.data || {};
-      const operationData = operation.data || {};
+      //const operationData = operation.data || {};
 
       const typePath = orgType ? orgType.path : 'company';
 

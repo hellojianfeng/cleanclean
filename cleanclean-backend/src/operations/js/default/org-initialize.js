@@ -312,7 +312,7 @@ const orgInitialize = async function (context, options = {}) {
     }
 
     if(follows.length>0){
-      const childrenFollows = await addOrgFollows(context,{follows});
+      await addOrgFollows(context,{follows});
     }
   }
 
@@ -338,7 +338,7 @@ const orgInitialize = async function (context, options = {}) {
     }
 
     if(follows.length > 0){
-      const ancestorFollows = await addOrgFollows(context,{follows});
+      await addOrgFollows(context,{follows});
     }
   }
 

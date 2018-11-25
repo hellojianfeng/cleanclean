@@ -4,9 +4,9 @@ module.exports = async function (context, options = {}) {
   const parseModels = require('./models-parse');
 
   const runService = context.app.service('run-operation');
-  const operationService = context.app.service('operations');
+  //const operationService = context.app.service('operations');
 
-  const user = context.params.user;
+  //const user = context.params.user;
 
   const { operation, current_org } = await parseModels(context,options);
 
@@ -30,6 +30,10 @@ module.exports = async function (context, options = {}) {
   });
   if (findResult.total === 1){
     result.isCalled = true;
+  }
+
+  if(context.data.action && context.data.action.toLowercase() === 'isuserallowed'){
+    
   }
 
   return context.result = result;

@@ -43,20 +43,22 @@ module.exports = function (options = {}) {
             {
               oid: orgInitialize._id,
               path: orgInitialize.path
-            },
-            {
-              oid: orgHome._id,
-              path: orgHome.path
             }
           ]
         },
       );
       //everyone permission
-      const everyonePermission = await permissionService.create(
+      await permissionService.create(
         {
           name: 'everyone',
           org_id: o._id,
-          org_path: o.path
+          org_path: o.path,
+          operations: [
+            {
+              oid: orgHome._id,
+              path: orgHome.path
+            }
+          ]
         }
       );//no need to assign user to this permission
 
@@ -92,7 +94,7 @@ module.exports = function (options = {}) {
       });
 
       //everybody role, include every person
-      const everybody = await roleService.create({
+      await roleService.create({
         name: 'everybody',
         org_id: o._id,
         org_path: o.path

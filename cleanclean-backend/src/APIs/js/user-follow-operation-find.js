@@ -8,17 +8,19 @@
  */
 const roleOperationFind = require('./role-operation-find');
 const permissionOperationFind = require('./permission-operation-find');
+const _ = require('lodash');
 module.exports = async function (context, options = {}) {
 
   //const mongooseClient = context.app.get('mongooseClient');
 
   const user = context.params.user;
 
-  const parseModels = require('./models-parse');
+  const parseContext = require('./models-context');
 
-  const { org, current_org } = await parseModels(context,options);
+  const { operation, opertion_org,current_org, user_roles } = await parseContext(context,options);
 
-  let orgId = org && org._id || current_org && current_org._id;
+  const followPermissions = [];
+  const followOperations = api.getPermissionOperations(permission);
 
   const operationService = context.app.service('operations');
 
