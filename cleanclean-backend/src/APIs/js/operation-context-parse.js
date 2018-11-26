@@ -1,5 +1,5 @@
 const _ = require('lodash');
-module.exports = async function (context, options={}) {
+module.exports = function (context, options={}) {
 
   let org, operation, role, permission, current_org, follow_org;
 
@@ -14,6 +14,7 @@ module.exports = async function (context, options={}) {
   const operationService = context.app.service('operations');
   const permissionService = context.app.service('permissions');
   const roleService = context.app.service('roles');
+  const userService = context.app.service('users');
 
   context.current = context.current || {};
 
@@ -67,6 +68,55 @@ module.exports = async function (context, options={}) {
           return context.current.operation;
         }
         //parse operation model
+        const contextOperation = context.data.operation;
+        const operationApp = context.data.app || 'default';
+
+        if (contextOperation){
+          const current_org = context.params.user && context.params.user.current_org;
+          const follow_org = context.params.user && context.params.user.follow_org;
+
+          if (typeof contextOperation === 'string'){
+            const mongoose = require('mongoose');
+            if(mongoose.Types.ObjectId.isValid(contextOperation)){
+              operation = await operationService.get(contextOperation);
+            } 
+            
+            if (!operation) {
+              const orgPath = operationData && operationData.org || follow_org && follow_org.path || current_org && current_org.path;
+              if (orgPath){
+                const finds = await operationService.find({query:{path: contextOperation ,org_path: orgPath, app: operationApp}});
+                if (finds.total === 1){
+                  operation = finds.data[0];
+                }
+              }
+            }
+          }
+
+          if (typeof contextOperation === 'object'){
+            if (contextOperation._id && contextOperation.path){
+              operation = contextOperation;
+            }
+            if (!operation && contextOperation.oid){
+              operation = await operationService.get(contextOperation.oid);
+            }
+          }
+
+          if (operation && operation.path){
+            if (operation.path === 'org-home'){
+              await userService.path(context.params.user._id, { current_org: operation.org, follow_org: null});
+              context.params.user.current_org = operation.org;
+              context.params.user.follow_org = null;
+            }
+            if (operation.path === 'org-follow'){
+              await userService.path(context.params.user._id, { follow_org: operation.org, current_org: null});
+              context.params.user.follow_org = operation.org;
+              context.params.user.current_org = null;
+            }
+
+            return context.current.operation = operation;
+          }
+        }
+
         if (operationData && operationData._id && operationData.path){
           operation = operationData;
         }
@@ -78,23 +128,23 @@ module.exports = async function (context, options={}) {
         if (!operation  && operationData && operationData.path){
           let finds;
           if(!finds && operationData.org && operationData.org.oid){
-            finds = await operationService.find({query: {path: operationData.path, org_id: operationData.org.oid }});
+            finds = await operationService.find({query: {path: operationData.path, org_id: operationData.org.oid, app: operationApp }});
           }
 
           if(!finds && operationData.org_id){
-            finds = await operationService.find({query: {path: operationData.path, org_id: operationData.org_id }});
+            finds = await operationService.find({query: {path: operationData.path, org_id: operationData.org_id, app: operationApp }});
           }
 
           if(!finds && operationData.org && operationData.org.path){
-            finds = await operationService.find({query: {path: operationData.path, org_path: operationData.org.path}});
+            finds = await operationService.find({query: {path: operationData.path, org_path: operationData.org.path, app: operationApp}});
           }
 
           if(!finds && operationData.org_path){
-            finds = await operationService.find({query: {path: operationData.path, org_path: operationData.org_path }});
+            finds = await operationService.find({query: {path: operationData.path, org_path: operationData.org_path, app: operationApp }});
           }
 
           if(!finds && operationData.org && typeof operationData.org === 'string'){
-            finds = await operationService.find({query: {path: operationData.path, org_path: operationData.org }});
+            finds = await operationService.find({query: {path: operationData.path, org_path: operationData.org, app: operationApp }});
           }
     
           if(finds && finds.total === 1){
@@ -201,8 +251,8 @@ module.exports = async function (context, options={}) {
     },
     get current_org(){ 
       return (async () => {
-        if(!context.current.current_org && current_org){
-          context.current.current_org = current_org;
+        if(context.current.current_org){
+          return context.current.current_org;
         }
         if (context && context.params && context.params.user && context.params.user.current_org && context.params.user.current_org.oid){
           current_org = await orgService.get(context.params.user.current_org.oid);
@@ -215,8 +265,8 @@ module.exports = async function (context, options={}) {
     },
     get follow_org(){ 
       return (async () => {
-        if(!context.current.follow_org && follow_org){
-          context.current.follow_org = follow_org;
+        if(context.current.follow_org){
+          context.current.follow_org;
         }
         if (context && context.params && context.params.user && context.params.user.follow_org && context.params.user.follow_org.oid){
           follow_org = await orgService.get(context.params.user.follow_org.oid);
@@ -228,7 +278,7 @@ module.exports = async function (context, options={}) {
       context.current.follow_org = o;
     },
     get operation_org(){
-      return (async (context) => {
+      return (async () => {
         const operation = context.current.operation;
         if (operation && operation.org && context.operation.oid){
           const operationOrg = await operationService.get(operation.oid);
@@ -242,11 +292,11 @@ module.exports = async function (context, options={}) {
     },
 
     get everyone(){
-      return (async (context) => {
+      return (async () => {
         if (context.current.everyone){
           return context.current.everyone;
         }
-        const current_org = this.current_org;
+        const current_org = await this.current_org;
         const finds = await permissionService.find({query:{org_id: current_org._id, path: 'everyone'}});
         if (finds.total === 1){
           context.current.everyone = finds.data[0];
@@ -256,29 +306,31 @@ module.exports = async function (context, options={}) {
     },
 
     get everyone_operations(){
-      return (async (context) => {
+      return (async () => {
 
         if (context.current.everyone_operations){
           return context.current.everyone_operations;
         }
 
-        const everyone = this.everyone;
+        const everyone = await this.everyone;
 
-        if(!context.current.everyone_operations && everyone && everyone.operations){
-          context.current.everyone_operations = everyone.operations;
-        }
+        const idList = everyone.operations.map ( o => { return o.oid; });
+
+        const finds = await operationService.find({query:{_id: {$in: idList}}});
+
+        context.current.everyone_operations = finds.data;
 
         return context.current.everyone_operations;
       })();
     },
 
     get everybody(){
-      return (async (context) => {
+      return (async () => {
         if (context.current.everybody){
           return context.current.everybody;
         }
-        const current_org = this.current_org;
-        const finds = await roleService.find({query:{org_id: current_org._id, path: 'everyone'}});
+        const current_org = await this.current_org;
+        const finds = await roleService.find({query:{org_id: current_org._id, path: 'everybody'}});
         if (finds.total === 1){
           context.current.everybody = finds.data[0];
         }
@@ -287,54 +339,71 @@ module.exports = async function (context, options={}) {
     },
 
     get everybody_permissions(){
-      return (async (context) => {
+      return (async () => {
 
         if (context.current.everybody_permissions){
           return context.current.everybody_permissions;
         }
 
-        const everybody = this.everybody;
+        const everybody = await this.everybody;
 
         if(!context.current.everybody_permissions && everybody && everybody.permissions){
-          context.current.everybody_permissions = everybody.permissions; 
+          const idList = everybody.permissions.map ( p => {
+            return p.oid;
+          });
+          const finds = await permissionService.find({query:{_id:{$in:idList}}});
+          context.current.everybody_permissions = finds.data; 
         }
 
-        return context.current.everyone_operations;
+        return context.current.everybody_permissions;
       })();
     },
 
     get everybody_operations(){
-      return (async (context) => {
+      return (async () => {
 
         if(context.current.everybody_operations){
           return context.current.everybody_operations;
         }
 
-        const permissions = this.everybody_permissions;
+        let everybody = await this.everybody;
 
-        let operations = operations.concat(this.everybody.operations);
+        let operations = everybody.operations;
 
-        const idList = permissions.map ( o => {
+        const permissions = await this.everybody_permissions;
+        
+        permissions.map ( p => {
+          operations = operations.concat(p.operations);
+        });
+
+        const everyone = await this.everyone;
+        operations = operations.concat(everyone.operations);
+
+        const idList = operations.map ( o => {
           return o.oid;
         });
 
-        const oPermissions = permissionService.find({query:{_id:{$in:idList}}});
+        const finds = await operationService.find({query:{_id: {$in: idList}}});
 
-        oPermissions.map ( o => {
-          operations = operations.concat(o.operations);
-        });
+        return context.current.everybody_operations =  finds.data;
 
-        if(!context.current.everybody_operations && operations){
-          context.current.everybody_operations =  _.uniquby(operations,function(e){return e.oid;});
-        }
-
-        return context.current.everybody_operations;
       })();
     },
 
     get user_roles(){
-      const user = context.params.user;
-      return user.roles;
+      return (async () => {
+        if (context.current.user_roles){
+          return context.current.user_roles;
+        }
+
+        const roleIds = context.params.user.roles.map ( o => {
+          return o.oid;
+        });
+
+        const finds = await roleService.find({query:{_id: {$in: roleIds}}});
+        
+        return context.current.user_roles = finds.data;
+      })();
     },
 
     get user_permissions(){
@@ -343,19 +412,21 @@ module.exports = async function (context, options={}) {
           return context.current.user_permissions;
         }
 
-        let permissions = context.params.user.permissions;
-
-        const roleIds = context.params.user.roles.map ( o => {
+        const permissionIds = context.params.user.permissions.map ( o => {
           return o.oid;
         });
 
-        const finds = await roleService.find({query:{_id: {$in: roleIds}}});
-        
-        finds.data.map ( r => {
-          permissions = permissions.concat(r.permissions);
+        const userRoles = await this.user_roles;
+
+        userRoles.map ( ur => {
+          ur.permissions.map ( urp => {
+            permissionIds.push(urp.oid);
+          });
         });
-        
-        context.current.user_permissions = _.uniqBy(permissions,function(e){return e.oid;});
+
+        const finds = await permissionService.find({query:{_id: {$in: permissionIds}}});
+
+        context.current.user_permissions = finds.data;
 
         return context.current.user_permissions;
       })();
@@ -371,24 +442,26 @@ module.exports = async function (context, options={}) {
 
         let operations = user.operations;
 
-        const userRoles = this.user_roles;
-
-        userRoles.map ( ur => {
-          operations = operations.concat(ur.operations);
+        const permissions = await this.user_permissions;
+      
+        permissions.map ( p => {
+          operations = operations.concat(p.operations);
         });
 
-        const userPermissions = await this.user_permissions;
-
-        userPermissions.map ( up => {
-          operations = operations.concat(up.operations);
+        let operationIds = operations.map ( o => {
+          return o.oid;
         });
 
-        return context.current.user_operations = _.uniqBy(operations,function(e){return e.oid;});
+        operationIds = _.uniq(operationIds);
+
+        const finds = await operationService.find({query:{_id:{$in:operationIds}}});
+
+        return context.current.user_operations = finds.data;
       })();
     },
 
     get user_follow_permissions(){
-      return (async (context) => {
+      return (async () => {
         if(context.current.user_follow_permissions){
           return context.current.user_follow_permissions;
         }
@@ -398,46 +471,47 @@ module.exports = async function (context, options={}) {
         const urList = userRoles.map ( ur => {
           return ur._id;
         });
-        const everybody = this.everybody;
+        const everybody = await this.everybody;
         urList.push(everybody._id);
-        let permissions;
+        let permissions = [];
 
         for (const follow of current_org.follows) {
           if (follow.org && follow.org.oid.equals(follow_org._id)){
             for(const fr of follow.org.follow.roles){
               if (urList.includes(fr.oid)){
-                permissions = follow.org.follow.permissions;
+                permissions = permissions.concat(follow.org.follow.permissions);
                 break;
               }
             }
           }
         }
-        if(!context.current.user_follow_permissions && permissions ){
-          context.current.user_follow_permissions = _.uniquby(permissions,function(e){return e.oid;});
+        if (permissions.length > 0){
+          const idList = permissions.map ( p => {
+            return p.oid;
+          });
+          const finds = permissionService.find({query:{$in: idList}});
+          permissions = finds.data;
         }
-        return context.current.user_permissions;
+        return context.current.user_follow_permissions = permissions;
       })();
     },
 
     get user_follow_operations(){
-      return (async (context) => {
-        const followPermissions = this.user_follow_permissions;
-        let userOperations = [];
+      return (async () => {
+        const followPermissions = await this.user_follow_permissions;
+        let opIds = [];
         for (const fp of followPermissions) {
-          const opIds = fp.operations.map( o => {
-            return o._id;
+          fp.operations.map( o => {
+            return opIds.push(o.oid);
           });
-          const operations = await operationService.find({query:{
-            _id: {
-              $in: opIds
-            }
-          }});
-          userOperations = userOperations.concat(operations.map ( o=> { return {oid: o._id, path: o.path};}));
         }
-        if (!context.current.user_follow_operations && userOperations){
-          context.current.user_follow_operations = _.uniqby(userOperations,function(e){return e.oid;});
-        }
-        return context.current.user_follow_operations;
+        const finds = await operationService.find({query:{
+          _id: {
+            $in: opIds
+          }
+        }});
+ 
+        return context.current.user_follow_operations = finds.data;
       })();
     },
   };
