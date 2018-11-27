@@ -1,7 +1,7 @@
 const _ = require('lodash');
 module.exports = function (context, options={}) {
 
-  let org, operation, role, permission, current_org, follow_org;
+  let org, operation, role, permission, current_org, follow_org, operation_org;
 
   let orgData = options.org || context && context.data && context.data.data && context.data.data.org;
   let org_id = options.org_id || context && context.data && context.data.data && context.data.data.org_id;
@@ -82,6 +82,7 @@ module.exports = function (context, options={}) {
             } 
             
             if (!operation) {
+              const operationData = context.data && context.data.data;
               const orgPath = operationData && operationData.org || follow_org && follow_org.path || current_org && current_org.path;
               if (orgPath){
                 const finds = await operationService.find({query:{path: contextOperation ,org_path: orgPath, app: operationApp}});
@@ -101,16 +102,19 @@ module.exports = function (context, options={}) {
             }
           }
 
-          if (operation && operation.path){
+          if (operation && operation.path && operation._id && operation.org_id){
+
+            context.current.operation_org = operation_org = await orgService.get(operation.org_id);            
+
             if (operation.path === 'org-home'){
-              await userService.path(context.params.user._id, { current_org: operation.org, follow_org: null});
-              context.params.user.current_org = operation.org;
+              await userService.patch(context.params.user._id, { current_org: { oid: operation.org_id, path: operation.org_path }, follow_org: null});
+              context.params.user.current_org = { oid: operation.org_id, path: operation.org_path };
               context.params.user.follow_org = null;
             }
             if (operation.path === 'org-follow'){
-              await userService.path(context.params.user._id, { follow_org: operation.org, current_org: null});
-              context.params.user.follow_org = operation.org;
-              context.params.user.current_org = null;
+              await userService.patch(context.params.user._id, { follow_org: { oid: operation.org_id, path: operation.org_path }});
+              context.params.user.follow_org = { oid: operation.org_id, path: operation.org_path };
+              //context.params.user.current_org = null;
             }
 
             return context.current.operation = operation;
@@ -152,6 +156,11 @@ module.exports = function (context, options={}) {
           }
         }
         return context.current.operation = operation;
+      })();
+    },
+    get operation_org(){
+      return (async () => {
+        return context.current.operation_org;
       })();
     },
     set operation(o){
@@ -475,16 +484,19 @@ module.exports = function (context, options={}) {
         urList.push(everybody._id);
         let permissions = [];
 
-        for (const follow of current_org.follows) {
-          if (follow.org && follow.org.oid.equals(follow_org._id)){
-            for(const fr of follow.org.follow.roles){
-              if (urList.includes(fr.oid)){
-                permissions = permissions.concat(follow.org.follow.permissions);
-                break;
+        if(follow_org){
+          for (const follow of current_org.follows) {
+            if (follow.org && follow.org.oid.equals(follow_org._id)){
+              for(const fr of follow.org.follow.roles){
+                if (urList.includes(fr.oid)){
+                  permissions = permissions.concat(follow.org.follow.permissions);
+                  break;
+                }
               }
             }
           }
         }
+
         if (permissions.length > 0){
           const idList = permissions.map ( p => {
             return p.oid;

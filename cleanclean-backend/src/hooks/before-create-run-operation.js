@@ -6,7 +6,7 @@ module.exports = function (options = {}) {
   return async context => {
 
     // const operationService = context.app.service('operations');
-    // const orgService = context.app.service('orgs');
+    const orgService = context.app.service('orgs');
     // const userService = context.app.service('users');
     const orgTypeService = context.app.service('org-types');
     const user = context.params.user;
@@ -18,9 +18,15 @@ module.exports = function (options = {}) {
 
     const operation = await contextParser.operation;
 
-    let org = await contextParser.org || await contextParser.follow_org || await contextParser.current_org;
+    let operation_org;
 
-    const orgType = org.type ? await orgTypeService.get(org.type.oid) : null;
+    if (operation && operation._id && operation.org_id){
+      operation_org = await orgService.get(operation.org_id);
+    } else {
+      throw new Error('no valid operation!');
+    }
+
+    const orgType = operation_org.type ? await orgTypeService.get(operation_org.type.oid) : null;
 
     //set context data for add run-operation record if needed
     context.data.operation = {
@@ -75,14 +81,14 @@ module.exports = function (options = {}) {
 
     const typeJsonData = JsonTools.mergeObjectInArray(typeJsons,4);
 
-    const orgJsons = JsonTools.getJsonsFromPathFiles('../operations/data/orgs/'+ org.path, 'org-initialize.json');
+    const orgJsons = JsonTools.getJsonsFromPathFiles('../operations/data/orgs/'+ operation_org.path, 'org-initialize.json');
 
     const orgJsonData = JsonTools.mergeObjectInArray(orgJsons,4);
 
     const runData = JsonTools.mergeObjects(4,typeJsonData.data,orgJsonData.data,operationData,processData);
 
     operation.data = runData;
-    operation.org = org;
+    operation.org = operation_org;
 
     const doOperation = require('../operations/js/'+ appName + '/' + operation.path.toLowerCase());
 
