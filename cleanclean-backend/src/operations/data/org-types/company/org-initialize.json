@@ -58,17 +58,13 @@
 		"follows":{
 			"$all_children": {
 				"tags": ["children"],
-				"follow": {
-					"roles": ["everybody"],
-					"permissions":["followone"]
-				}
+				"roles": ["everybody"],
+				"permissions":["followone"]
 			},
 			"$all_ancestors": {
 				"tags": ["ancestor"],
-				"follow": {
-					"roles": ["everybody"],
-					"permissions":["followone"]
-				}
+				"roles": ["everybody"],
+				"permissions":["followone"]
 			}
 		}
 	}

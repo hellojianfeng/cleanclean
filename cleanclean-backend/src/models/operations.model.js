@@ -34,7 +34,7 @@ module.exports = function (app) {
     timestamps: true
   });
 
-  operations.index({ path: 1, org_1: 1, app: 1 },  { unique: true });
+  operations.index({ path: 1, org_id: 1, app: 1 },  { unique: true });
   operations.index({ path: 1, org_path: 1, app: 1 },  { unique: true });
 
   return mongooseClient.model('operations', operations);

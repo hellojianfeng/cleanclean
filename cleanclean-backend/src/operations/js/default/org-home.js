@@ -22,7 +22,7 @@ module.exports = async function (context, options = {}) {
   const {org} = await modelsParse(context);
 
   if (!org) {
-    result.data = {
+    result.result = {
       error: 'not find org!'
     };
     context.result = result;

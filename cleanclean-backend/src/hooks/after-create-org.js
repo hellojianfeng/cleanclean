@@ -34,6 +34,13 @@ module.exports = function (options = {}) {
         org_id: o._id,
         org_path: o.path
       });
+      //add default org-follow operation
+      const orgFollow = await operationService.create({
+        name: 'org-follow',
+        org_id: o._id,
+        org_path: o.path
+      });
+      //administrator permission
       const administrators = await permissionService.create(
         {
           name: 'administrators',
@@ -43,29 +50,37 @@ module.exports = function (options = {}) {
             {
               oid: orgInitialize._id,
               path: orgInitialize.path
-            },
+            }
+          ]
+        },
+      );
+      //everyone permission with org_home operation
+      await permissionService.create(
+        {
+          name: 'everyone',
+          org_id: o._id,
+          org_path: o.path,
+          operations: [
             {
               oid: orgHome._id,
               path: orgHome.path
             }
           ]
-        },
-      );
-      //everyone permission
-      const everyonePermission = await permissionService.create(
-        {
-          name: 'everyone',
-          org_id: o._id,
-          org_path: o.path
         }
       );//no need to assign user to this permission
 
-      //followone permission
+      //followone permission with org_follow operation
       await permissionService.create(
         {
           name: 'followone',
           org_id: o._id,
-          org_path: o.path
+          org_path: o.path,
+          operations: [
+            {
+              oid: orgFollow._id,
+              path: orgFollow.path
+            }
+          ]
         }
       );//no need to assign user to this permission
 
@@ -78,7 +93,7 @@ module.exports = function (options = {}) {
         }
       );//no need to assign user to this permission
 
-      //each org admin role
+      //org admin role
       const admin = await roleService.create({
         name: 'admin',
         permissions: [
@@ -92,7 +107,7 @@ module.exports = function (options = {}) {
       });
 
       //everybody role, include every person
-      const everybody = await roleService.create({
+      await roleService.create({
         name: 'everybody',
         org_id: o._id,
         org_path: o.path
@@ -111,7 +126,8 @@ module.exports = function (options = {}) {
       //add current user as admin and set current org for user
       await userService.patch(context.params.user._id, {
         roles:roles,
-        current_org: {oid: o._id, path: o.path }
+        current_org: {oid: o._id, path: o.path },
+        follow_org: null
       });
     }));
 
