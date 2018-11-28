@@ -22,7 +22,7 @@ const orgInitialize = async function (context, options = {}) {
   const checkInitialize = async function(){
     const runService = context.app.service('run-operation');
     const query = {
-      "operation.oid":operation._id
+      'operation.oid':operation._id
     };
     const findResult = await runService.find({query});
     if (findResult.total > 0){

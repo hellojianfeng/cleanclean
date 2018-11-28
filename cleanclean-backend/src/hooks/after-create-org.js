@@ -34,6 +34,13 @@ module.exports = function (options = {}) {
         org_id: o._id,
         org_path: o.path
       });
+      //add default org-follow operation
+      const orgFollow = await operationService.create({
+        name: 'org-follow',
+        org_id: o._id,
+        org_path: o.path
+      });
+      //administrator permission
       const administrators = await permissionService.create(
         {
           name: 'administrators',
@@ -47,7 +54,7 @@ module.exports = function (options = {}) {
           ]
         },
       );
-      //everyone permission
+      //everyone permission with org_home operation
       await permissionService.create(
         {
           name: 'everyone',
@@ -62,12 +69,18 @@ module.exports = function (options = {}) {
         }
       );//no need to assign user to this permission
 
-      //followone permission
+      //followone permission with org_follow operation
       await permissionService.create(
         {
           name: 'followone',
           org_id: o._id,
-          org_path: o.path
+          org_path: o.path,
+          operations: [
+            {
+              oid: orgFollow._id,
+              path: orgFollow.path
+            }
+          ]
         }
       );//no need to assign user to this permission
 
@@ -80,7 +93,7 @@ module.exports = function (options = {}) {
         }
       );//no need to assign user to this permission
 
-      //each org admin role
+      //org admin role
       const admin = await roleService.create({
         name: 'admin',
         permissions: [

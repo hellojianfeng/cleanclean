@@ -1,7 +1,7 @@
 const _ = require('lodash');
 module.exports = function (context, options={}) {
 
-  let org, operation, role, permission, current_org, follow_org, operation_org;
+  let org, operation, role, permission, current_org, follow_org;
 
   let orgData = options.org || context && context.data && context.data.data && context.data.data.org;
   let org_id = options.org_id || context && context.data && context.data.data && context.data.data.org_id;
@@ -104,7 +104,7 @@ module.exports = function (context, options={}) {
 
           if (operation && operation.path && operation._id && operation.org_id){
 
-            context.current.operation_org = operation_org = await orgService.get(operation.org_id);            
+            context.current.operation_org = await orgService.get(operation.org_id);            
 
             if (operation.path === 'org-home'){
               await userService.patch(context.params.user._id, { current_org: { oid: operation.org_id, path: operation.org_path }, follow_org: null});
@@ -286,20 +286,6 @@ module.exports = function (context, options={}) {
     set follow_org(o){
       context.current.follow_org = o;
     },
-    get operation_org(){
-      return (async () => {
-        const operation = context.current.operation;
-        if (operation && operation.org && context.operation.oid){
-          const operationOrg = await operationService.get(operation.oid);
-          if (!context.current.operation_org && operationOrg)
-          {
-            context.current.operation_org = operationOrg;
-          }
-        } 
-        return context.current.operation_org;
-      })();
-    },
-
     get everyone(){
       return (async () => {
         if (context.current.everyone){
@@ -415,6 +401,24 @@ module.exports = function (context, options={}) {
       })();
     },
 
+    get user_org_roles(){
+      return (async () => {
+        if (context.current.user_org_roles){
+          return context.current.user_org_roles;
+        }
+
+        const org = await this.operation_org || this.current_org;
+
+        const roles = await this.user_roles;
+
+        if (org && roles && roles.length > 0) {
+          return context.current.user_org_roles = roles.filter (r => {
+            return r.org_path === org.path;
+          });
+        }
+      })();
+    },
+
     get user_permissions(){
       return (async () => {
         if (context.current.user_permissions){
@@ -475,21 +479,21 @@ module.exports = function (context, options={}) {
           return context.current.user_follow_permissions;
         }
         const follow_org = await this.follow_org;
-        const userRoles = await this.user_roles;
+        const userRoles = await this.user_org_roles;
         const current_org = await this.current_org;
         const urList = userRoles.map ( ur => {
-          return ur._id;
+          return ur.path;
         });
         const everybody = await this.everybody;
-        urList.push(everybody._id);
+        urList.push(everybody.path);
         let permissions = [];
 
         if(follow_org){
           for (const follow of current_org.follows) {
             if (follow.org && follow.org.oid.equals(follow_org._id)){
-              for(const fr of follow.org.follow.roles){
-                if (urList.includes(fr.oid)){
-                  permissions = permissions.concat(follow.org.follow.permissions);
+              for(const fr of follow.follow.roles){
+                if (urList.includes(fr.path)){
+                  permissions = permissions.concat(follow.follow.permissions);
                   break;
                 }
               }
@@ -501,7 +505,7 @@ module.exports = function (context, options={}) {
           const idList = permissions.map ( p => {
             return p.oid;
           });
-          const finds = permissionService.find({query:{$in: idList}});
+          const finds = await permissionService.find({query:{_id:{$in: idList}}});
           permissions = finds.data;
         }
         return context.current.user_follow_permissions = permissions;

@@ -26,8 +26,8 @@ module.exports = async function (context) {
     context.result = result;
 
     //remove user's current org
-    const userService = context.app.service('users');
-    await userService.patch(user._id, { current_org: null });
+    //const userService = context.app.service('users');
+    //await userService.patch(user._id, { current_org: null });
   }
 
   return context;
