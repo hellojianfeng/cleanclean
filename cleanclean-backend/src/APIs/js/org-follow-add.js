@@ -22,11 +22,11 @@ module.exports = async function (context, options = {}) {
 
   const followData = options && options.follow || context && context.data && context.data.data && context.data.data.follow;
 
-  const { org, current_org } = await modelsParse(context,{org: followData.org});
+  const { org, current_org } = await modelsParse(context,{org: followData.org_path});
 
   const newRoles = [];
-  if (followData && followData.follow && followData.follow.roles){
-    for ( const r of followData.follow.roles){
+  if (followData && followData.roles){
+    for ( const r of followData.roles){
       if (typeof r === 'object' && r.oid && r.path){
         newRoles.push(r);
         continue;
@@ -46,8 +46,8 @@ module.exports = async function (context, options = {}) {
   }
 
   const newPermissions = [];
-  if (followData && followData.follow && followData.follow.permissions){
-    for ( const p of followData.follow.permissions){
+  if (followData && followData.permissions){
+    for ( const p of followData.permissions){
       if (typeof p === 'object' && p.oid && p.path){
         newPermissions.push(p);
         continue;
@@ -70,19 +70,19 @@ module.exports = async function (context, options = {}) {
   if (current_org && newPermissions.length > 0 && newRoles.length > 0){
     let finded = false;
     current_org.follows.map ( o => {
-      if ( o.org.oid.equals(org._id) ){
+      if ( o.org_id.equals(org._id) ){
         finded = true;
         newRoles.map ( nr => {
-          if(!_.contains(o.follow.roles, nr))
+          if(!_.contains(o.roles, nr))
           {
-            o.follow.roles.push(nr);
+            o.roles.push(nr);
             changed = true;
           }
         });
         newPermissions.map ( np => {
-          if(!_.contains(o.follow.permissions, np))
+          if(!_.contains(o.permissions, np))
           {
-            o.follow.permissions.push(np);
+            o.permissions.push(np);
             changed = true;
           }
         });
@@ -99,15 +99,10 @@ module.exports = async function (context, options = {}) {
       changed = true;
       current_org.follows.push(
         {
-          org: {
-            oid: org._id,
-            path: org.path
-          },
-          follow:
-          {
-            roles: newRoles,
-            permissions: newPermissions
-          },
+          org_id: org._id,
+          org_path: org.path,
+          roles: newRoles,
+          permissions: newPermissions,
           tags: followData.tags
         }
       );

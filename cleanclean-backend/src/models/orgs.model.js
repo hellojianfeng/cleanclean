@@ -25,15 +25,13 @@ module.exports = function (app) {
   });
 
   const followOrgSchema = new Schema({
-    org: { 
-      oid: Schema.Types.ObjectId, 
-      path: String 
+    org_id: { 
+      type: Schema.Types.ObjectId, 
     },
+    org_path: String,
     tags: [String],
-    follow: {
-      roles: [ followRoleSchema ],
-      permissions:[ followPermissionSchema ]
-    },
+    roles: [ followRoleSchema ],
+    permissions:[ followPermissionSchema ],
     data: { type: Schema.Types.Mixed }
   });
 

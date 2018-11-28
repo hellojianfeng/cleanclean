@@ -289,21 +289,18 @@ const orgInitialize = async function (context, options = {}) {
   
   if(runFollows && runFollows.hasOwnProperty('$all_children')){
     const follows = [];
-    const permissions = runFollows['$all_children']['follow']['permissions'];
-    const roles = runFollows['$all_children']['follow']['roles'];
+    const permissions = runFollows['$all_children']['permissions'];
+    const roles = runFollows['$all_children']['roles'];
     const tags = runFollows['$all_children']['tags'];
     for (const child of children)
     {
       follows.push(
         {
-          org: {
-            oid: child._id,
-            path: child.path
-          },
+          org_id: child._id,
+          org_path: child.path,
           tags: tags,
-          follow: {
-            roles, permissions
-          }
+          roles,
+          permissions
         }
       );
     }
@@ -315,21 +312,18 @@ const orgInitialize = async function (context, options = {}) {
 
   if(runFollows && runFollows.hasOwnProperty('$all_ancestors')){
     const follows = [];
-    const permissions = runFollows['$all_ancestors']['follow']['permissions'];
-    const roles = runFollows['$all_ancestors']['follow']['roles'];
+    const permissions = runFollows['$all_ancestors']['permissions'];
+    const roles = runFollows['$all_ancestors']['roles'];
     const tags = runFollows['$all_ancestors']['tags'];
     for (const anc of ancestors)
     {
       follows.push(
         {
-          org: {
-            oid: anc._id,
-            path: anc.path
-          },
+          org_id: anc._id,
+          org_path: anc.path,
           tags: tags,
-          follow: {
-            roles, permissions
-          }
+          roles,
+          permissions
         }
       );
     }

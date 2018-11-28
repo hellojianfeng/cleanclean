@@ -385,37 +385,24 @@ module.exports = function (context, options={}) {
       })();
     },
 
+    //user roles in current org
     get user_roles(){
       return (async () => {
         if (context.current.user_roles){
           return context.current.user_roles;
         }
 
-        const roleIds = context.params.user.roles.map ( o => {
-          return o.oid;
+        const current_org = await this.current_org;
+
+        const roleIds = context.params.user.roles.map ( r => {
+          return r.oid;
         });
 
         const finds = await roleService.find({query:{_id: {$in: roleIds}}});
         
-        return context.current.user_roles = finds.data;
-      })();
-    },
-
-    get user_org_roles(){
-      return (async () => {
-        if (context.current.user_org_roles){
-          return context.current.user_org_roles;
-        }
-
-        const org = await this.operation_org || this.current_org;
-
-        const roles = await this.user_roles;
-
-        if (org && roles && roles.length > 0) {
-          return context.current.user_org_roles = roles.filter (r => {
-            return r.org_path === org.path;
-          });
-        }
+        return context.current.user_roles = finds.data.filter ( r => {
+          return r.org_path === current_org.path;
+        });
       })();
     },
 
@@ -425,7 +412,9 @@ module.exports = function (context, options={}) {
           return context.current.user_permissions;
         }
 
-        const permissionIds = context.params.user.permissions.map ( o => {
+        const current_org = await this.current_org;
+
+        const permissionIds = context.params.user.permissions.map ( p => {
           return o.oid;
         });
 
@@ -439,7 +428,9 @@ module.exports = function (context, options={}) {
 
         const finds = await permissionService.find({query:{_id: {$in: permissionIds}}});
 
-        context.current.user_permissions = finds.data;
+        context.current.user_permissions = finds.data.filter( p => {
+          return p.org_path === current_org.path
+        });
 
         return context.current.user_permissions;
       })();
@@ -450,6 +441,8 @@ module.exports = function (context, options={}) {
         if (context.current.user_operations){
           return context.current.user_operations;
         }
+
+        const current_org = await this.current_org;
 
         const user = context.params.user;
 
@@ -469,7 +462,9 @@ module.exports = function (context, options={}) {
 
         const finds = await operationService.find({query:{_id:{$in:operationIds}}});
 
-        return context.current.user_operations = finds.data;
+        return context.current.user_operations = finds.data.filter( o => {
+          return o.org_path === current_org.path;
+        });
       })();
     },
 
@@ -479,7 +474,7 @@ module.exports = function (context, options={}) {
           return context.current.user_follow_permissions;
         }
         const follow_org = await this.follow_org;
-        const userRoles = await this.user_org_roles;
+        const userRoles = await this.user_roles;
         const current_org = await this.current_org;
         const urList = userRoles.map ( ur => {
           return ur.path;
@@ -490,10 +485,10 @@ module.exports = function (context, options={}) {
 
         if(follow_org){
           for (const follow of current_org.follows) {
-            if (follow.org && follow.org.oid.equals(follow_org._id)){
-              for(const fr of follow.follow.roles){
+            if (follow.org_id && follow.org_id.equals(follow_org._id)){
+              for(const fr of follow.roles){
                 if (urList.includes(fr.path)){
-                  permissions = permissions.concat(follow.follow.permissions);
+                  permissions = permissions.concat(follow.permissions);
                   break;
                 }
               }

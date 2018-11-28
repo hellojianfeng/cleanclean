@@ -20,11 +20,8 @@ module.exports = async function (context, options = {}) {
   const org = await parseContext.operation_org;
 
   if (stage === 'start'){
-
+    result.result.follow_operations = user_follow_operations;
     result.result.follow_org = org;
-
-    result.result.user_follow_operations = user_follow_operations;
-  
     context.result = result;
   }
 
