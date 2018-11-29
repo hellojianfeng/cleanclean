@@ -17,30 +17,22 @@ module.exports = async function (context, options = {}) {
     result: {}
   };
 
-  const current_org = await contextParser.current_org;
-
-  if (!current_org) {
-    result.result = {
-      error: 'not find org!'
-    };
-    context.result = result;
-    return context;
-  } else {
-    result.result.org = current_org;
-  }
-
   //open action return org user list
   if (action === 'open'){
 
-    const finds = await userService.find({query: { $or: [
-      {'roles.org.path': current_org.path},
-      {'permissions.org.path':current_org.path},
-      {'operations.org.path': current_org.path}
-    ]}});
-
-    result.users = finds.data;
+    result.result.org_users = await contextParser.current_org_users;
+    result.result.org_roles = await contextParser.current_org_roles;
+    result.result.org_roles = result.result.org_roles.filter( r => {
+      return r.path !== 'followone' // not allow add user directly into this role
+    })
+    result.result.org_permissions = await contextParser.current_org_permissions;
+    result.result.org_operations = await contextParser.current_org_operations;
   
     context.result = result;
+  }
+
+  if (action === 'add-user'){
+    const userData = operation.data.user;
   }
 
   return context;

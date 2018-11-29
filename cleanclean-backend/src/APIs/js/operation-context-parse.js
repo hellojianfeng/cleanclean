@@ -525,6 +525,72 @@ module.exports = function (context, options={}) {
         return context.current.user_follow_operations = finds.data;
       })();
     },
+
+    get current_org_users(){
+      return (async () => {
+        if(context.current.current_org_users){
+          return context.current.current_org_users;
+        }
+
+        const current_org = await this.current_org;
+
+        const finds = await userService.find({query: { $or: [
+          {'roles.org.path': current_org.path},
+          {'permissions.org.path':current_org.path},
+          {'operations.org.path': current_org.path}
+        ]}});
+
+        //only return roles in org for users
+        return context.current.current_org_users = finds.data.map ( u => {
+          u.roles = u.roles.filter ( r => {
+            return r.org.path === current_org.path;
+          });
+          return u;
+        });
+      })();
+    },
+
+    get current_org_roles(){
+      return (async () => {
+        if(context.current.current_org_roles){
+          return context.current.current_org_roles;
+        }
+
+        const current_org = await this.current_org;
+
+        const finds = await roleService.find({query: { org_path: current_org.path }});
+
+        return context.current.current_org_roles = finds.data;
+      })();
+    },
+
+    get current_org_permissions(){
+      return (async () => {
+        if(context.current.current_org_permissions){
+          return context.current.current_org_permissions;
+        }
+
+        const current_org = await this.current_org;
+
+        const finds = await permissionService.find({query: { org_path: current_org.path }});
+
+        return context.current.current_org_permissions = finds.data;
+      })();
+    },
+
+    get current_org_operations(){
+      return (async () => {
+        if(context.current.current_org_operations){
+          return context.current.current_org_operations;
+        }
+
+        const current_org = await this.current_org;
+
+        const finds = await operationService.find({query: { org_path: current_org.path }});
+
+        return context.current.current_org_operations = finds.data;
+      })();
+    }
   };
 
   return context.result = result;

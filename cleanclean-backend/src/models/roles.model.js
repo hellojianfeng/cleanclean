@@ -25,6 +25,9 @@ module.exports = function (app) {
     path: { type: String }, // dot sperated string, for example, company1#department1#office1, default is same as name
     org_id: { type: Schema.Types.ObjectId, required: true  },
     org_path: { type: String, required: true  },
+    status: {
+      join_org: { type: String, enum: ['joinable', 'default_join_role'], }
+    },
     permissions: [ theSchema ],
     operations: [ theSchema ],
     data: { type: Schema.Types.Mixed }
