@@ -415,7 +415,7 @@ module.exports = function (context, options={}) {
         const current_org = await this.current_org;
 
         const permissionIds = context.params.user.permissions.map ( p => {
-          return o.oid;
+          return p.oid;
         });
 
         const userRoles = await this.user_roles;
@@ -429,7 +429,7 @@ module.exports = function (context, options={}) {
         const finds = await permissionService.find({query:{_id: {$in: permissionIds}}});
 
         context.current.user_permissions = finds.data.filter( p => {
-          return p.org_path === current_org.path
+          return p.org_path === current_org.path;
         });
 
         return context.current.user_permissions;

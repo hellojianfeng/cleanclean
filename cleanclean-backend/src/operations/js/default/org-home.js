@@ -7,7 +7,7 @@ module.exports = async function (context, options = {}) {
 
   //const operationData = context.data.data || {};
   const operation = options.operation;
-  const stage = context.data.stage || 'start';
+  const action = context.data.action || 'open';
 
   //const mongooseClient = context.app.get('mongooseClient');
 
@@ -15,7 +15,7 @@ module.exports = async function (context, options = {}) {
 
   const result = {
     operation: operation.path,
-    stage,
+    action,
     result: {}
   };
 
@@ -33,7 +33,7 @@ module.exports = async function (context, options = {}) {
   const userService = context.app.service('users');
   await userService.patch(user._id, { current_org: {oid: org._id, path: org.path}});
 
-  if (stage === 'start'){
+  if (action === 'open'){
 
     const userOperations = await userOperationFind(context);
     const everyoneOperations = await everyoneOperationFind(context);

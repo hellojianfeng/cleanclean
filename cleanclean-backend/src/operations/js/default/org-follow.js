@@ -3,7 +3,7 @@ module.exports = async function (context, options = {}) {
 
   //const operationData = context.data.data || {};
   //const operation = options.operation;
-  const stage = context.data.stage || 'start';
+  const action = context.data.action || 'open';
 
   //const mongooseClient = context.app.get('mongooseClient');
   const parseContext = require('../../../APIs/js/operation-context-parse')(context,options);
@@ -12,14 +12,14 @@ module.exports = async function (context, options = {}) {
 
   const result = {
     operation: operation.path,
-    stage,
+    action,
     result: {}
   };
 
   const user_follow_operations = await parseContext.user_follow_operations;
   const org = await parseContext.operation_org;
 
-  if (stage === 'start'){
+  if (action === 'open'){
     result.result.follow_operations = user_follow_operations;
     result.result.follow_org = org;
     context.result = result;

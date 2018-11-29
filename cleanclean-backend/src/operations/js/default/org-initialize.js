@@ -15,7 +15,7 @@ const orgInitialize = async function (context, options = {}) {
 
   const runData = operation.data;
 
-  let stage = context.data.stage || 'start';
+  let action = context.data.action || 'open';
 
   let isInitialized = false;
 
@@ -39,7 +39,7 @@ const orgInitialize = async function (context, options = {}) {
     };
     return context;
   } else {
-    if (stage === 'check'){
+    if (action === 'check'){
       context.result = {
         is_initialized: isInitialized,
         message: 'org is not initialized, please initialize it first!'
@@ -48,13 +48,13 @@ const orgInitialize = async function (context, options = {}) {
     }
   }
 
-  if (stage === 'start'){
+  if (action === 'open'){
     context.result = runData;
     return context;
   }
 
-  if (stage !== 'initialize'){
-    context.result = { message: 'support stages: start | initialize'};
+  if (action !== 'initialize'){
+    context.result = { message: 'support actions: open | initialize'};
   }
 
   //if end stage, run real org initialize
