@@ -82,8 +82,9 @@ module.exports = function (context, options={}) {
               operation = await operationService.get(contextOperation);
             } 
             
-            if (!operation) {
-              const orgPath = contextOperation === 'org-follow'? current_org && current_org.path : operationData && operationData.org || follow_org && follow_org.path || current_org && current_org.path;
+            if (!operation) { 
+              const orgPath = operationData && operationData.org || follow_org && follow_org.path || current_org && current_org.path;
+              
               if (orgPath){
                 const finds = await operationService.find({query:{path: contextOperation ,org_path: orgPath, app: operationApp}});
                 if (finds.total === 1){
@@ -112,19 +113,9 @@ module.exports = function (context, options={}) {
               context.params.user.follow_org = null;
             }
             if (operation.path === 'org-follow'){
-              const orgPath = operationData && operationData.org;
-              if (orgPath){
-                const finds = await orgService.find({query:{path:orgPath}});
-                if (finds.total === 1) {
-                  const follow_org = { oid: finds.data[0]._id, path: finds.data[0].path};
-                  await userService.patch(context.params.user._id, {follow_org});
-                  context.params.user.follow_org = follow_org;
-                } else {
-                  throw new Error('not find valid follow org!');
-                }
-              } else {
-                throw new Error('please provide org property in operation data!');
-              }
+              const follow_org = { oid: operation.org_id, path: operation.org_path };
+              await userService.patch(context.params.user._id, {follow_org});
+              context.params.user.follow_org = follow_org;
               
               //context.params.user.current_org = null;
             }
