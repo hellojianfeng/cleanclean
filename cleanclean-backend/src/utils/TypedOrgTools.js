@@ -1,31 +1,33 @@
 const fs = require('fs');
 
 return module.exports = {
-    getTyedOrgDataThroughNestedPath: function(context, org = null){
+  getTyedOrgDataThroughNestedPath: async function(context, org = null){
 
-        const mongooseClient = context.app.get('mongooseClient');
-        const { Schema } = mongooseClient;
+    const mongooseClient = context.app.get('mongooseClient');
+    const { Schema } = mongooseClient;
+    const orgService = context.app.service('orgs');
+    const orgTypeService = context.app.service('org-types');
 
-        const user = context.params.user;
+    const user = context.params.user;
 
-        if(!(user && user.current_org && user.current_org.oid || org)){
-            return null;
-        }
+    if(!(user && user.current_org && user.current_org.oid || org)){
+      return null;
+    }
 
-        let org = org || user.current_org && user.current_org.oid;
+    org = org || user.current_org && user.current_org.oid;
 
-        if (org instanceof Schema.Types.ObjectId){
-            org = await orgService.get(org);
-        }
+    if (org instanceof Schema.Types.ObjectId){
+      org = await orgService.get(org);
+    }
 
-        if(!org){
-            return null;
-        }
+    if(!org){
+      return null;
+    }
 
-        if(org.type){
-            const orgType = await orgTypeService.get(org.type.oid);
-        }
+    if(org.type){
+      await orgTypeService.get(org.type.oid);
+    }
  
         
-    }
-  };
+  }
+};

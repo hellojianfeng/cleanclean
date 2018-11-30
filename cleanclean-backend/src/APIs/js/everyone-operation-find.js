@@ -11,7 +11,7 @@ module.exports = async function (context, options = {}) {
 
   const finds = await permissionService.find({
     query: {
-      'org.oid':orgId,
+      'org_oid':orgId,
       path: 'everyone'
     }
   });

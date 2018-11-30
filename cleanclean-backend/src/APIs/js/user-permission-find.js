@@ -25,7 +25,7 @@ module.exports = async function (context, options = {}) {
 
   //get all roles operation
   await Promise.all(user.roles.map ( async o => {
-    if ( o.org.oid.equals(orgId)){
+    if ( o.org_id.equals(orgId)){
       await rolePermissionFind(context, { role_id: o.oid });
       Object.assign( permissionList, context.result);
     }
@@ -33,7 +33,7 @@ module.exports = async function (context, options = {}) {
 
   //get all user operations
   await Promise.all(user.permissions.map ( async o => {
-    if ( o.org.oid.equals(orgId)){
+    if ( o.org_id.equals(orgId)){
       const permission = await permissionService.get(o.oid);
       permissionList[permission.path] = permission;
     }

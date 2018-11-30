@@ -9,10 +9,8 @@ module.exports = function (app) {
   const theSchema = new Schema({
     oid: { type: Schema.Types.ObjectId },
     path: { type: String }, // dot sperated string, for example, default is same as name
-    org: { 
-      oid: { type: Schema.Types.ObjectId },
-      path: { type: String }
-    },
+    org_id: { type: Schema.Types.ObjectId },
+    org_path: { type: String },
     data: { type: Schema.Types.Mixed }
   });
   

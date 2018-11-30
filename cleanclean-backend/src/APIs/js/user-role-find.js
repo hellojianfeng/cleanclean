@@ -24,7 +24,7 @@ module.exports = async function (context, options = {}) {
 
   //get all user roles
   await Promise.all(user.roles.map ( async o => {
-    if ( o.org.oid.equals(orgId)){
+    if ( o.org_id.equals(orgId)){
       const role = await roleService.get(o.oid);
       roleList[role.path] = role;
     }

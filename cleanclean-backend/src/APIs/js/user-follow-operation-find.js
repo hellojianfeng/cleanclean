@@ -19,6 +19,8 @@ module.exports = async function (context, options = {}) {
 
   const { operation, opertion_org,current_org, user_roles } = await parseContext(context,options);
 
+  const orgId = current_org._id;
+
   const followPermissions = [];
   const followOperations = api.getPermissionOperations(permission);
 
@@ -28,7 +30,7 @@ module.exports = async function (context, options = {}) {
 
   //get all roles operation
   await Promise.all(user.roles.map ( async o => {
-    if ( o.org.oid.equals(orgId)){
+    if ( o.org_oid.equals(orgId)){
       await roleOperationFind(context, { role_id: o.oid });
       Object.assign( operationList, context.result);
     }
@@ -36,7 +38,7 @@ module.exports = async function (context, options = {}) {
 
   //get all permissions operation
   await Promise.all(user.permissions.map ( async o => {
-    if (orgId.equals(o.org.oid)){
+    if (orgId.equals(o.org_oid)){
       await permissionOperationFind(context, { permission_id: o.oid });
       Object.assign( operationList, context.result);
     }
@@ -44,7 +46,7 @@ module.exports = async function (context, options = {}) {
 
   //get all user operations
   await Promise.all(user.operations.map ( async o => {
-    if (orgId.equals(o.org.oid)){
+    if (orgId.equals(o.org_oid)){
       const operation = await operationService.get(o.oid);
       operationList[operation.path] = operation;
     }

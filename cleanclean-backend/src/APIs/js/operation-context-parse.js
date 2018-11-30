@@ -70,6 +70,7 @@ module.exports = function (context, options={}) {
         //parse operation model
         const contextOperation = context.data.operation;
         const operationApp = context.data.app || 'default';
+        const operationData = context.data && context.data.data;
 
         if (contextOperation){
           const current_org = context.params.user && context.params.user.current_org;
@@ -82,8 +83,7 @@ module.exports = function (context, options={}) {
             } 
             
             if (!operation) {
-              const operationData = context.data && context.data.data;
-              const orgPath = operationData && operationData.org || follow_org && follow_org.path || current_org && current_org.path;
+              const orgPath = contextOperation === 'org-follow'? current_org && current_org.path : operationData && operationData.org || follow_org && follow_org.path || current_org && current_org.path;
               if (orgPath){
                 const finds = await operationService.find({query:{path: contextOperation ,org_path: orgPath, app: operationApp}});
                 if (finds.total === 1){
@@ -112,8 +112,20 @@ module.exports = function (context, options={}) {
               context.params.user.follow_org = null;
             }
             if (operation.path === 'org-follow'){
-              await userService.patch(context.params.user._id, { follow_org: { oid: operation.org_id, path: operation.org_path }});
-              context.params.user.follow_org = { oid: operation.org_id, path: operation.org_path };
+              const orgPath = operationData && operationData.org;
+              if (orgPath){
+                const finds = await orgService.find({query:{path:orgPath}});
+                if (finds.total === 1) {
+                  const follow_org = { oid: finds.data[0]._id, path: finds.data[0].path};
+                  await userService.patch(context.params.user._id, {follow_org});
+                  context.params.user.follow_org = follow_org;
+                } else {
+                  throw new Error('not find valid follow org!');
+                }
+              } else {
+                throw new Error('please provide org property in operation data!');
+              }
+              
               //context.params.user.current_org = null;
             }
 
@@ -535,15 +547,15 @@ module.exports = function (context, options={}) {
         const current_org = await this.current_org;
 
         const finds = await userService.find({query: { $or: [
-          {'roles.org.path': current_org.path},
-          {'permissions.org.path':current_org.path},
-          {'operations.org.path': current_org.path}
+          {'roles.org_path': current_org.path},
+          {'permissions.org_path':current_org.path},
+          {'operations.org_path': current_org.path}
         ]}});
 
         //only return roles in org for users
         return context.current.current_org_users = finds.data.map ( u => {
           u.roles = u.roles.filter ( r => {
-            return r.org.path === current_org.path;
+            return r.org_path === current_org.path;
           });
           return u;
         });

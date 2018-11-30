@@ -127,10 +127,8 @@ module.exports = function (options = {}) {
       roles.push({
         oid: admin._id,
         path: admin.path,
-        org: {
-          oid: o._id,
-          path: o.path
-        }
+        org_id: o._id,
+        org_path: o.path
       });
 
       //add current user as admin and set current org for user

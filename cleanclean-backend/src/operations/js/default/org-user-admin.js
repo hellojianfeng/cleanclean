@@ -23,8 +23,8 @@ module.exports = async function (context, options = {}) {
     result.result.org_users = await contextParser.current_org_users;
     result.result.org_roles = await contextParser.current_org_roles;
     result.result.org_roles = result.result.org_roles.filter( r => {
-      return r.path !== 'followone' // not allow add user directly into this role
-    })
+      return r.path !== 'followone'; // not allow add user directly into this role
+    });
     result.result.org_permissions = await contextParser.current_org_permissions;
     result.result.org_operations = await contextParser.current_org_operations;
   
