@@ -5,6 +5,7 @@ module.exports = async function (context, options = {}) {
   const operation = options.operation;
   const action = context.data.action || 'open';
   const contextParser = require('../../../APIs/js/operation-context-parse')(context,options);
+  const modelParser = require('../../../APIs/js/models-parse');
 
   //const mongooseClient = context.app.get('mongooseClient');
   const userService = context.app.service('users');
@@ -31,8 +32,44 @@ module.exports = async function (context, options = {}) {
     context.result = result;
   }
 
-  if (action === 'add-user'){
-    const userData = operation.data.user;
+  //if not provide role for user, use everybody role
+  if (action === 'add-org-user' || action === 'add-user-role'){
+    let {role,user} = await modelParser.role(context,operation.data);
+    if (!role){
+      role = await contextParser.everybody;
+    }
+    if(user && role){
+      const userRoles = await contextParser.user_roles;
+      if (userRoles.length === 0){ //if user is not in org, add user as everybody role
+        await userService.patch(user._id,{ roles: {oid: role._id, path: role.path, org_id: role.org_id, org_path: role.org_path}});
+      } else {
+        const pathList = userRoles.map ( ur => {
+          return ur.path;
+        });
+        if (!pathList.includes(role.path)){
+          user.roles.push({oid: role._id, path: role.path, org_id: role.org_id, org_path: role.org_path});
+          await userService.patch(user._id, { roles: user.roles });
+        }
+      }
+    } else {
+      throw new Error('no valid user or role!');
+    }
+  }
+
+  if(action === 'create-org-user'){
+
+  }
+
+  if(action === 'find-user'){
+
+  }
+
+  if(action === 'add-user-permission'){
+
+  }
+
+  if(action === 'add-user-operation'){
+
   }
 
   return context;
