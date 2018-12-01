@@ -5,7 +5,8 @@ module.exports = async function (context, options = {}) {
   const operation = options.operation;
   const action = context.data.action || 'open';
   const contextParser = require('../../../APIs/js/operation-context-parse')(context,options);
-  const modelParser = require('../../../APIs/js/models-parse');
+  const modelParser = require('../../../APIs/js/model-parser');
+  const _ = require('lodash');
 
   //const mongooseClient = context.app.get('mongooseClient');
   const userService = context.app.service('users');
@@ -34,30 +35,49 @@ module.exports = async function (context, options = {}) {
 
   //if not provide role for user, use everybody role
   if (action === 'add-org-user' || action === 'add-user-role'){
-    let {role,user} = await modelParser.role(context,operation.data);
-    if (!role){
-      role = await contextParser.everybody;
+    let {role,roles,user} = await modelParser.role(context,operation.data);
+    if (role){
+      roles.push(role);
     }
-    if(user && role){
+    roles = _.uniqBy(roles, r => { return r._id});
+
+    if (roles.length === 0){
+      const r = await contextParser.everybody;
+      roles.push(r);
+    }
+
+    if(user && roles.length > 0){
       const userRoles = await contextParser.user_roles;
       if (userRoles.length === 0){ //if user is not in org, add user as everybody role
-        await userService.patch(user._id,{ roles: {oid: role._id, path: role.path, org_id: role.org_id, org_path: role.org_path}});
+        roles = roles.map ( r => {
+          return { oid: r._id, path: r.path, org_id: r.org_id, org_path: r.org_path};
+        })
       } else {
-        const pathList = userRoles.map ( ur => {
-          return ur.path;
-        });
-        if (!pathList.includes(role.path)){
-          user.roles.push({oid: role._id, path: role.path, org_id: role.org_id, org_path: role.org_path});
-          await userService.patch(user._id, { roles: user.roles });
-        }
+        roles = roles.concat(userRoles);
+        roles = _.uniqBy(roles, r => {
+          return r.oid;
+        })
+      }
+      if (roles.length > 0){
+        context.params.user.roles = roles;
+        await userService.patch(user._id,{roles});
+        result.user = context.params.user;
+        context.result = result;
       }
     } else {
-      throw new Error('no valid user or role!');
+      throw new Error('no valid user or role(s)!');
     }
   }
 
   if(action === 'create-org-user'){
-
+    const createUserData = context.data && context.data.data && context.data.data.create_user;
+    if (typeof createUserData === Object && createUserData.email && createUserData.password){
+      const user = await userService.create(createUserData);
+      if (user){
+        user.roles = [ { oid: everybody._id, path: everybody.path, org_id: everybody.org_id, org_path: everybody.org_path}];
+        await user.patch(user._id, { roles: user.roles });
+      }
+    }
   }
 
   if(action === 'find-user'){
