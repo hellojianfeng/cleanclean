@@ -116,9 +116,9 @@ module.exports = function (options = {}) {
         org_path: o.path
       });
 
-      //everybody role, include every person
+      //everyone role, include every person
       await roleService.create({
-        name: 'everybody',
+        name: 'everyone',
         org_id: o._id,
         org_path: o.path
       });

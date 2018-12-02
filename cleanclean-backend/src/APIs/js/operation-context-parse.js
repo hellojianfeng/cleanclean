@@ -6,7 +6,7 @@ module.exports = function (context, options={}) {
   let orgData = options.org || context && context.data && context.data.data && context.data.data.org;
   let org_id = options.org_id || context && context.data && context.data.data && context.data.data.org_id;
   let org_path = options.org_path || context && context.data && context.data.data && context.data.data.org_path;
-  let operationData = options.operation || context && context.data && context.data.data && context.data.data.operation;
+  //let operationData = options.operation || context && context.data && context.data.data && context.data.data.operation;
   let roleData = options.role || context && context.data && context.data.data && context.data.data.role;
   let permissionData = options.permission || context && context.data && context.data.data && context.data.data.permission;
 
@@ -289,93 +289,93 @@ module.exports = function (context, options={}) {
     set follow_org(o){
       context.current.follow_org = o;
     },
-    get everyone(){
+    get everyone_permission(){
       return (async () => {
-        if (context.current.everyone){
-          return context.current.everyone;
+        if (context.current.everyone_permission){
+          return context.current.everyone_permission;
         }
         const current_org = await this.current_org;
         const finds = await permissionService.find({query:{org_id: current_org._id, path: 'everyone'}});
         if (finds.total === 1){
-          context.current.everyone = finds.data[0];
+          context.current.everyone_permission = finds.data[0];
         }
-        return context.current.everyone;
+        return context.current.everyone_permission;
       })();
     },
 
-    get everyone_operations(){
+    get everyone_permission_operations(){
       return (async () => {
 
         if (context.current.everyone_operations){
           return context.current.everyone_operations;
         }
 
-        const everyone = await this.everyone;
+        const pEveryone = await this.everyone_permission;
 
-        const idList = everyone.operations.map ( o => { return o.oid; });
+        const idList = pEveryone.operations.map ( o => { return o.oid; });
 
         const finds = await operationService.find({query:{_id: {$in: idList}}});
 
-        context.current.everyone_operations = finds.data;
+        context.current.everyone_permission_operations = finds.data;
 
-        return context.current.everyone_operations;
+        return context.current.everyone_permission_operations;
       })();
     },
 
-    get everybody(){
+    get everyone_role(){
       return (async () => {
-        if (context.current.everybody){
-          return context.current.everybody;
+        if (context.current.everyone_role){
+          return context.current.everyone_role;
         }
         const current_org = await this.current_org;
-        const finds = await roleService.find({query:{org_id: current_org._id, path: 'everybody'}});
+        const finds = await roleService.find({query:{org_id: current_org._id, path: 'everyone'}});
         if (finds.total === 1){
-          context.current.everybody = finds.data[0];
+          context.current.everyone_role = finds.data[0];
         }
-        return context.current.everybody;
+        return context.current.everyone_role;
       })();
     },
 
-    get everybody_permissions(){
+    get everyone_role_permissions(){
       return (async () => {
 
-        if (context.current.everybody_permissions){
-          return context.current.everybody_permissions;
+        if (context.current.everyone_role_permissions){
+          return context.current.everyone_role_permissions;
         }
 
-        const everybody = await this.everybody;
+        const everyone_role = await this.everyone_role;
 
-        if(!context.current.everybody_permissions && everybody && everybody.permissions){
-          const idList = everybody.permissions.map ( p => {
+        if(!context.current.everyone_role_permissions && everyone_role && everyone_role.permissions){
+          const idList = everyone_role.permissions.map ( p => {
             return p.oid;
           });
           const finds = await permissionService.find({query:{_id:{$in:idList}}});
-          context.current.everybody_permissions = finds.data; 
+          context.current.everyone_role_permissions = finds.data; 
         }
 
-        return context.current.everybody_permissions;
+        return context.current.everyone_role_permissions;
       })();
     },
 
-    get everybody_operations(){
+    get everyone_role_operations(){
       return (async () => {
 
-        if(context.current.everybody_operations){
-          return context.current.everybody_operations;
+        if(context.current.everyone_role_operations){
+          return context.current.everyone_role_operations;
         }
 
-        let everybody = await this.everybody;
+        let everyone_role = await this.everyone_role;
 
-        let operations = everybody.operations;
+        let operations = everyone_role.operations;
 
-        const permissions = await this.everybody_permissions;
+        const permissions = await this.everyone_role_permissions;
         
         permissions.map ( p => {
           operations = operations.concat(p.operations);
         });
 
-        const everyone = await this.everyone;
-        operations = operations.concat(everyone.operations);
+        const everyone_permission = await this.everyone_permission;
+        operations = operations.concat(everyone_permission.operations);
 
         const idList = operations.map ( o => {
           return o.oid;
@@ -383,7 +383,7 @@ module.exports = function (context, options={}) {
 
         const finds = await operationService.find({query:{_id: {$in: idList}}});
 
-        return context.current.everybody_operations =  finds.data;
+        return context.current.everyone_role_operations =  finds.data;
 
       })();
     },
@@ -482,8 +482,8 @@ module.exports = function (context, options={}) {
         const urList = userRoles.map ( ur => {
           return ur.path;
         });
-        const everybody = await this.everybody;
-        urList.push(everybody.path);
+        const everyone_role = await this.everyone_role;
+        urList.push(everyone_role.path);
         let permissions = [];
 
         if(follow_org){
