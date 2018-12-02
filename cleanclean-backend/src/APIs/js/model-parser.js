@@ -132,7 +132,7 @@ module.exports = async function (context,options={}, refresh=false) {
     }
 
     if (email){
-      const finds = userService.find({query: { email: email}});
+      const finds = await userService.find({query: { email: email}});
       if (finds.total === 1) {
         return finds.data[0];
       }
@@ -177,7 +177,7 @@ module.exports = async function (context,options={}, refresh=false) {
     if (context.model_parser.everyone_role){
       return context.model_parser.everyone_role;
     }
-    const org = await getCurrentOrg;
+    const org = await getCurrentOrg();
     if(org && org._id){
       const finds = await roleService.find({query:{path:'everyone',org_id:org._id}});
       if (finds.total === 1) {
@@ -245,7 +245,7 @@ module.exports = async function (context,options={}, refresh=false) {
     }
 
     if (path){
-      const org = await getOrg || await getCurrentOrg;
+      const org = await getOrg() || await getCurrentOrg();
       if (org && org._id){
         const finds = service.find({query:{path:path, org_id:org._id}});
         if (finds.total === 1){
@@ -259,7 +259,7 @@ module.exports = async function (context,options={}, refresh=false) {
   const getModelList = async (listData, service) => {
     const list = [];
     let model, path;
-    const org = await getOrg || await getCurrentOrg;
+    const org = await getOrg() || await getCurrentOrg();
     for (const e of listData){
       if (typeof e === 'object') {
         if (e._id && e.path){
@@ -353,49 +353,49 @@ module.exports = async function (context,options={}, refresh=false) {
     if(refresh){
       delete context.model_parser.roles;
     }
-    context.model_parser.roles = roles = context.model_parser.roles ? context.model_parser.roles : await getRoles;
+    context.model_parser.roles = roles = context.model_parser.roles ? context.model_parser.roles : await getRoles();
   }
 
   if (permissionData){
     if(refresh){
       delete context.model_parser.permission;
     }
-    context.model_parser.permission = permission = context.model_parser.permission ? context.model_parser.permission : await getPermission;
+    context.model_parser.permission = permission = context.model_parser.permission ? context.model_parser.permission : await getPermission();
   }
 
   if (permissionsData){
     if(refresh){
       delete context.model_parser.permissions;
     }
-    context.model_parser.permissions = permissions = context.model_parser.permissions ? context.model_parser.permissions : await getPermissions;
+    context.model_parser.permissions = permissions = context.model_parser.permissions ? context.model_parser.permissions : await getPermissions();
   }
 
   if (operationData){
     if(refresh){
       delete context.model_parser.operation;
     }
-    context.model_parser.operation = operation = context.model_parser.operation ? context.model_parser.operation : await getOperation;
+    context.model_parser.operation = operation = context.model_parser.operation ? context.model_parser.operation : await getOperation();
   }
 
   if (operationsData){
     if(refresh){
       delete context.model_parser.operations;
     }
-    context.model_parser.operations = operations = context.model_parser.operations ? context.model_parser.operations : await getOperations;
+    context.model_parser.operations = operations = context.model_parser.operations ? context.model_parser.operations : await getOperations();
   }
 
   if (userData){
     if(refresh){
       delete context.model_parser.user;
     }
-    context.model_parser.user = user = context.model_parser.user ? context.model_parser.user : await getUser;
+    context.model_parser.user = user = context.model_parser.user ? context.model_parser.user : await getUser();
   }
 
   if (usersData){
     if(refresh){
       delete context.model_parser.users;
     }
-    context.model_parser.users = users = context.model_parser.users ? context.model_parser.users : await getUsers;
+    context.model_parser.users = users = context.model_parser.users ? context.model_parser.users : await getUsers();
   }
 
   return { 

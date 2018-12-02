@@ -15,7 +15,7 @@ module.exports = function (app) {
   });
   
   const users = new mongooseClient.Schema({
-    mobile: {type: String, unique: true},
+    mobile: {type: String},
     email: {type: String, unique: true, lowercase: true},
     username:{type: String, unique: true, lowercase: true},
     fullname: { 

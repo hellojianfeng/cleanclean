@@ -6,6 +6,7 @@ module.exports = async function (context, options = {}) {
   const action = context.data.action || 'open';
   const contextParser = require('../../../APIs/js/operation-context-parse')(context,options);
   const modelParser = require('../../../APIs/js/model-parser');
+  const findUserRoles = require('../../../APIs/js/user-role-find');
   const _ = require('lodash');
 
   //const mongooseClient = context.app.get('mongooseClient');
@@ -37,6 +38,7 @@ module.exports = async function (context, options = {}) {
   //if not provide role for user, use everyone role
   if (action === 'add-org-user' || action === 'add-user-role'){
     let {role,roles,user,everyone_role} = await modelParser(context,options);
+    const user_roles = await findUserRoles(context,options);
     if (role){
       roles.push(role);
     }
@@ -47,21 +49,27 @@ module.exports = async function (context, options = {}) {
     }
 
     if(user && roles.length > 0){
-      const userRoles = await contextParser.user_roles;
-      if (userRoles.length === 0){ //if user is not in org, add user as everyone role
+      if (user_roles.length === 0){ //if user is not in org, add user as everyone role
         roles = roles.map ( r => {
           return { oid: r._id, path: r.path, org_id: r.org_id, org_path: r.org_path};
         });
       } else {
-        roles = roles.concat(userRoles);
+        roles = roles.concat(user_roles);
         roles = _.uniqBy(roles, r => {
-          return r.oid;
+          return r._id;
         });
       }
       if (roles.length > 0){
-        context.params.user.roles = roles;
-        await userService.patch(user._id,{roles});
-        result.user = context.params.user;
+        user.roles = roles.map ( r => {
+          return {
+            oid: r._id,
+            path: r.path,
+            org_id: r.org_id,
+            org_path: r.org_path
+          };
+        });
+        await userService.patch(user._id,{roles: user.roles});
+        result.result.user = user;
         context.result = result;
       }
     } else {

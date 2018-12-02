@@ -10,23 +10,21 @@ module.exports = async function (context, options = {}) {
 
   const mongooseClient = context.app.get('mongooseClient');
 
-  const user = context.params.user;
+  const modelParser = require('./model-parser');
 
-  const parseModels = require('./models-parse');
+  const { user, current_operation_org, current_org } = await modelParser(context,options);
 
-  const { org, current_org } = await parseModels(context,options);
-
-  let orgId = org && org._id || current_org && current_org._id;
+  const orgId = current_operation_org._id || current_org._id;
 
   const roleService = context.app.service('roles');
 
-  const roleList = {};
+  const roleList = [];
 
   //get all user roles
   await Promise.all(user.roles.map ( async o => {
     if ( o.org_id.equals(orgId)){
       const role = await roleService.get(o.oid);
-      roleList[role.path] = role;
+      roleList.push(role);
     }
   }));
   
