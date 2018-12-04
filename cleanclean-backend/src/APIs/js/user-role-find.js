@@ -8,7 +8,7 @@
  */
 module.exports = async function (context, options = {}) {
 
-  const mongooseClient = context.app.get('mongooseClient');
+  //const mongooseClient = context.app.get('mongooseClient');
 
   const modelParser = require('./model-parser');
 
