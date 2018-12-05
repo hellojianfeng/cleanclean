@@ -6,7 +6,7 @@ module.exports = async function (context, options = {}) {
   const action = context.data.action || 'open';
 
   //const mongooseClient = context.app.get('mongooseClient');
-  const parseContext = require('../../../APIs/js/operation-context-parse')(context,options);
+  const contextParser = require('../../../APIs/js/context-parser');
 
   const operation = await parseContext.operation;
 
@@ -16,12 +16,11 @@ module.exports = async function (context, options = {}) {
     result: {}
   };
 
-  const user_follow_operations = await parseContext.user_follow_operations;
-  const org = await parseContext.operation_org;
+  const { user_follow_operations, current_operation_org } = await contextParser(context, options);
 
   if (action === 'open'){
     result.result.follow_operations = user_follow_operations;
-    result.result.follow_org = org;
+    result.result.follow_org = current_operation_org;
     context.result = result;
   }
 

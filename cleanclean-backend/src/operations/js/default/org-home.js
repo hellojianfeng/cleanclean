@@ -2,7 +2,7 @@
 const userOperationFind = require('../../../APIs/js/user-operation-find');
 const everyoneOperationFind = require('../../../APIs/js/everyone-operation-find');
 const checkOperationStatus = require('../../../APIs/js/check-operation-status');
-const modelsParse = require('../../../APIs/js/models-parse');
+const contextParser = require('../../../APIs/js/context-parser');
 module.exports = async function (context, options = {}) {
 
   //const operationData = context.data.data || {};
@@ -19,7 +19,7 @@ module.exports = async function (context, options = {}) {
     result: {}
   };
 
-  const {org} = await modelsParse(context);
+  const {org} = await contextParser(context);
 
   if (!org) {
     result.result = {

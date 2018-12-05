@@ -14,9 +14,9 @@ module.exports = async function (context, options = {}) {
 
   const user = context.params.user;
 
-  const parseModels = require('./models-parse');
+  const contextParser = require('./context-parser');
 
-  const { org, current_org } = await parseModels(context,options);
+  const { org, current_org } = await contextParser(context,options);
 
   let orgId = org && org._id || current_org && current_org._id;
 

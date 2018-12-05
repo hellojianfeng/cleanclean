@@ -280,7 +280,6 @@ const orgInitialize = async function (context, options = {}) {
   //add follows org
   const orgChildrenFind = require('../../../APIs/js/org-children-find');
   const orgAncestorFind = require('../../../APIs/js/org-ancestor-find');
-  //const modelsParse = require('../../../APIs/js/models-parse');
   const addOrgFollows = require('../../../APIs/js/org-follows-add');
   const children = await orgChildrenFind(context,{org});
   const ancestors = await orgAncestorFind(context,{org});

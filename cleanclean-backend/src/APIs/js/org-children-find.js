@@ -16,9 +16,9 @@ module.exports = async function (context, options = {}) {
 
   const orgService = context.app.service('orgs');
 
-  const parseModels = require('./models-parse');
+  const contextParser = require('./context-parser');
 
-  let { org, current_org } = await parseModels(context,options);
+  let { org, current_org } = await contextParser(context,options);
 
   if (!org && current_org){
     org = current_org;
