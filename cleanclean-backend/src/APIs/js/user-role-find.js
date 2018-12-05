@@ -10,9 +10,9 @@ module.exports = async function (context, options = {}) {
 
   //const mongooseClient = context.app.get('mongooseClient');
 
-  const modelParser = require('./model-parser');
+  const contextParser = require('./context-parser');
 
-  const { user, current_operation_org, current_org } = await modelParser(context,options);
+  const { user, current_operation_org, current_org } = await contextParser(context,options);
 
   const orgId = current_operation_org._id || current_org._id;
 

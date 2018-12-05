@@ -4,8 +4,8 @@ module.exports = async function (context, options = {}) {
   //const operationData = context.data.data || {};
   const operation = options.current_operation;
   const action = context.data.action || 'open';
-  const contextParser = require('../../../APIs/js/operation-context-parse')(context,options);
-  const modelParser = require('../../../APIs/js/model-parser');
+  //const contextParser = require('../../../APIs/js/operation-context-parse')(context,options);
+  const contextParser = require('../../../APIs/js/context-parser');
   const findUserRoles = require('../../../APIs/js/user-role-find');
   const _ = require('lodash');
 
@@ -23,7 +23,7 @@ module.exports = async function (context, options = {}) {
   //open action return org user list
   if (action === 'open'){
 
-    const {current_org_users, current_org_roles, current_org_permissions, current_org_operations} = await modelParser(context,options);
+    const {current_org_users, current_org_roles, current_org_permissions, current_org_operations} = await contextParser(context,options);
 
     result.result.org_users = current_org_users;
     result.result.org_permissions = current_org_permissions.filter( r => {
@@ -37,7 +37,7 @@ module.exports = async function (context, options = {}) {
 
   //if not provide role for user, use everyone role
   if (action === 'add-org-user' || action === 'add-user-role'){
-    let {role,roles,user,everyone_role} = await modelParser(context,options);
+    let {role,roles,user,everyone_role} = await contextParser(context,options);
     const user_roles = await findUserRoles(context,options);
     if (role){
       roles.push(role);
@@ -79,7 +79,7 @@ module.exports = async function (context, options = {}) {
 
   if(action === 'create-org-user'){
     const createUserData = context.data && context.data.data && context.data.data.create_user;
-    const {everyone_role} = await modelParser(context,options);
+    const {everyone_role} = await contextParser(context,options);
     if (typeof createUserData === Object && createUserData.email && createUserData.password){
       const user = await userService.create(createUserData);
       if (user){

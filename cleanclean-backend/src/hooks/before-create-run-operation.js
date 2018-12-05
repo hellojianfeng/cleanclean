@@ -11,14 +11,14 @@ module.exports = function (options = {}) {
     const orgTypeService = context.app.service('org-types');
     const user = context.params.user;
 
-    const contextParser = require('../APIs/js/operation-context-parse')(context,options);
-    const modelParser = require('../APIs/js/model-parser');
+    //const contextParser = require('../APIs/js/operation-context-parse')(context,options);
+    const contextParser = require('../APIs/js/context-parser');
 
     const operationData = context.data.data || {};
     const appName = context.data.app || 'default';
 
     //const operation = await contextParser.operation;
-    const { current_operation, current_operation_org } = await modelParser(context,options);
+    const { current_operation, current_operation_org } = await contextParser(context,options);
 
     if(!current_operation || !current_operation._id){
       throw new Error('no valid operation!');
@@ -37,10 +37,7 @@ module.exports = function (options = {}) {
 
     let isAllowOperation = false;
 
-    const everyone_role_operations = await contextParser.everyone_role_operations;
-    const everyone_permission_operations = await contextParser.everyone_permission_operations;
-    const user_operations = await contextParser.user_operations;
-    const user_follow_operations = await contextParser.user_follow_operations;
+    const { everyone_role_operations, everyone_permission_operations, user_operations, user_follow_operations } = await contextParser(context, options);
 
     everyone_permission_operations.map ( o => {
       if ( o._id.equals(current_operation._id)){

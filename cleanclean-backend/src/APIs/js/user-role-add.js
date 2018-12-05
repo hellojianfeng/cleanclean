@@ -10,11 +10,11 @@ module.exports = async function (context, options = {}) {
 
   //const mongooseClient = context.app.get('mongooseClient');
 
-  const modelParser = require('./model-parser');
+  const contextParser = require('./context-parser');
   const findUserRoles = require('./user-role-find');
   const _ = require('lodash');
 
-  const { users, user, roles, everyone_role } = await modelParser(context,options);
+  const { users, user, roles, everyone_role } = await contextParser(context,options);
 
   //const orgId = current_operation_org._id || current_org._id;
 
