@@ -6,14 +6,14 @@ module.exports = async function (context, options = {}) {
 
   //const mongooseClient = context.app.get('mongooseClient');
 
-  const parseModels = require('./models-parse');
+  const contextParser = require('./context-parser');
 
   const roleList = [];
 
   const roleService = context.app.service('roles');
   const operationService = context.app.service('operations');
 
-  const { org, current_org } = await parseModels(context,options);
+  const { org, current_org } = await contextParser(context,options);
 
   let orgId = org && org._id || current_org && current_org._id;
 

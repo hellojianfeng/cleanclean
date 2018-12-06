@@ -15,7 +15,7 @@ module.exports = async function (context) {
   const orgList = {};
 
   await Promise.all(user.roles.map ( async o => {
-    const org = await orgService.get(o.org.oid);
+    const org = await orgService.get(o.org_id);
     orgList[org.path] = org;
   }));
 

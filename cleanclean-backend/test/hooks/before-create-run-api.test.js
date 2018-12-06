@@ -15,7 +15,7 @@ describe('\'before-create-run-api\' hook', () => {
     });
 
     app.service('dummy').hooks({
-      before: beforeCreateRunApi()
+      //before: beforeCreateRunApi()
     });
   });
 

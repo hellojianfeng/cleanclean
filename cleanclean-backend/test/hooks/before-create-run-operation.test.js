@@ -15,7 +15,7 @@ describe('\'before-create-run-operation\' hook', () => {
     });
 
     app.service('dummy').hooks({
-      after: beforeCreateRunOperation()
+      //after: beforeCreateRunOperation()
     });
   });
 

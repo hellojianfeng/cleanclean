@@ -2,12 +2,12 @@
 const userOperationFind = require('../../../APIs/js/user-operation-find');
 const everyoneOperationFind = require('../../../APIs/js/everyone-operation-find');
 const checkOperationStatus = require('../../../APIs/js/check-operation-status');
-const modelsParse = require('../../../APIs/js/models-parse');
+const contextParser = require('../../../APIs/js/context-parser');
 module.exports = async function (context, options = {}) {
 
   //const operationData = context.data.data || {};
   const operation = options.operation;
-  const stage = context.data.stage || 'start';
+  const action = context.data.action || 'open';
 
   //const mongooseClient = context.app.get('mongooseClient');
 
@@ -15,11 +15,11 @@ module.exports = async function (context, options = {}) {
 
   const result = {
     operation: operation.path,
-    stage,
+    action,
     result: {}
   };
 
-  const {org} = await modelsParse(context);
+  const {org} = await contextParser(context);
 
   if (!org) {
     result.result = {
@@ -33,7 +33,7 @@ module.exports = async function (context, options = {}) {
   const userService = context.app.service('users');
   await userService.patch(user._id, { current_org: {oid: org._id, path: org.path}});
 
-  if (stage === 'start'){
+  if (action === 'open'){
 
     const userOperations = await userOperationFind(context);
     const everyoneOperations = await everyoneOperationFind(context);

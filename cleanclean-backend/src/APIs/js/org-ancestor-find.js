@@ -12,13 +12,13 @@
  */
 module.exports = async function (context, options = {}) {
 
-  const mongooseClient = context.app.get('mongooseClient');
+  //const mongooseClient = context.app.get('mongooseClient');
 
   const orgService = context.app.service('orgs');
 
-  const parseModels = require('./models-parse');
+  const contetParser = require('./context-parser');
 
-  const { org, current_org } = await parseModels(context,options);
+  let { org, current_org } = await contetParser(context,options);
 
   if (!org && current_org){
     org = current_org;
@@ -39,7 +39,7 @@ module.exports = async function (context, options = {}) {
       startString += '#' + s;
     }
     return startString;
-  })
+  });
 
   //const ancestorMatch = new RegExp('#'+ancestorStart+'$');
 

@@ -40,6 +40,12 @@ module.exports = function (options = {}) {
         org_id: o._id,
         org_path: o.path
       });
+      //add default org-follow operation
+      const orgUserManage = await operationService.create({
+        name: 'org-user-admin',
+        org_id: o._id,
+        org_path: o.path
+      });
       //administrator permission
       const administrators = await permissionService.create(
         {
@@ -50,6 +56,10 @@ module.exports = function (options = {}) {
             {
               oid: orgInitialize._id,
               path: orgInitialize.path
+            },
+            {
+              oid: orgUserManage._id,
+              path: orgUserManage.path
             }
           ]
         },
@@ -106,9 +116,9 @@ module.exports = function (options = {}) {
         org_path: o.path
       });
 
-      //everybody role, include every person
+      //everyone role, include every person
       await roleService.create({
-        name: 'everybody',
+        name: 'everyone',
         org_id: o._id,
         org_path: o.path
       });
@@ -117,10 +127,8 @@ module.exports = function (options = {}) {
       roles.push({
         oid: admin._id,
         path: admin.path,
-        org: {
-          oid: o._id,
-          path: o.path
-        }
+        org_id: o._id,
+        org_path: o.path
       });
 
       //add current user as admin and set current org for user

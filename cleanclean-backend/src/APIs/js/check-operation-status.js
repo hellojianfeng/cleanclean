@@ -1,14 +1,16 @@
 
 module.exports = async function (context, options = {}) {
 
-  const parseModels = require('./models-parse');
+  const contextParser = require('./context-parser');
 
   const runService = context.app.service('run-operation');
   //const operationService = context.app.service('operations');
 
   //const user = context.params.user;
 
-  const { operation, current_org } = await parseModels(context,options);
+  const { current_operation, current_org } = await contextParser(context,options);
+
+  const operation = current_operation;
 
   if (!operation || !operation._id){
     throw new Error('please provide operation id!');

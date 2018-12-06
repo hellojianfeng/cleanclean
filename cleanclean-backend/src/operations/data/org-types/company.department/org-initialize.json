@@ -17,7 +17,7 @@
 		"follows":{
 			"$all_ancestors": {
 				"tags": ["ancestor"],
-				"roles": ["everybody"],
+				"roles": ["everyone"],
 				"permissions":["followone"]
 			}
 		}

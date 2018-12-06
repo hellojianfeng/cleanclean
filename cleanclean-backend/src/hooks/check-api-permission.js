@@ -17,7 +17,7 @@ module.exports = function (options = {}) {
       if(!user){
         throw new Error('user must be authenticated first!');
       }
-      if(!(user.current_org && user.current_org.oid){
+      if(!(user.current_org && user.current_org.oid)){
         throw new Error('current org is not found!');
       }
       // if(!context.data.org.equal(user.current_org)){

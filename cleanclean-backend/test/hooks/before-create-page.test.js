@@ -15,7 +15,7 @@ describe('\'before-create-page\' hook', () => {
     });
 
     app.service('dummy').hooks({
-      before: beforeCreatePage()
+      //before: beforeCreatePage()
     });
   });
 

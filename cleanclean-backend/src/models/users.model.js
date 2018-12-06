@@ -9,17 +9,15 @@ module.exports = function (app) {
   const theSchema = new Schema({
     oid: { type: Schema.Types.ObjectId },
     path: { type: String }, // dot sperated string, for example, default is same as name
-    org: { 
-      oid: { type: Schema.Types.ObjectId },
-      path: { type: String }
-    },
+    org_id: { type: Schema.Types.ObjectId },
+    org_path: { type: String },
     data: { type: Schema.Types.Mixed }
   });
   
   const users = new mongooseClient.Schema({
-    mobile: {type: String, unique: true},
+    mobile: {type: String},
     email: {type: String, unique: true, lowercase: true},
-    username:{type: String, unique: true, lowercase: true},
+    username:{type: String, lowercase: true},
     fullname: { 
       surname: { type: String },
       familyname: { type: String },

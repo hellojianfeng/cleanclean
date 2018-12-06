@@ -18,11 +18,11 @@ module.exports = async function (context, options = {}) {
   //const roleService = context.app.service('roles');
   //const permissionService = context.app.service('permissions');
 
-  const modelsParse = require('./models-parse');
+  const contextParser = require('./context-parser');
 
   const followData = options && options.follow || context && context.data && context.data.data && context.data.data.follow;
 
-  const { org, current_org } = await modelsParse(context,{org: followData.org_path});
+  const { org, current_org } = await contextParser(context,{org: followData.org_path});
 
   const newRoles = [];
   if (followData && followData.roles){
@@ -33,7 +33,7 @@ module.exports = async function (context, options = {}) {
       }
       let role;
       if(typeof r === 'string'){
-        const models = await modelsParse(context, { role: { path: r, org: current_org }});
+        const models = await contextParser(context, { role: { path: r, org: current_org }});
         role = models.role;
       }
       if (typeof r === 'object' && r._id && r.path){
@@ -54,7 +54,7 @@ module.exports = async function (context, options = {}) {
       }
       let permission;
       if(typeof p === 'string'){
-        const models = await modelsParse(context, { permission: { path: p, org: org }});
+        const models = await contextParser(context, { permission: { path: p, org: org }});
         permission = models.permission;
       }
       if (typeof p === 'object' && p._id && p.path){

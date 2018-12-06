@@ -15,7 +15,7 @@ describe('\'after-create-org\' hook', () => {
     });
 
     app.service('dummy').hooks({
-      after: afterCreateOrg()
+      //after: afterCreateOrg()
     });
   });
 
