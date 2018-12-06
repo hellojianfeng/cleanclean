@@ -15,7 +15,7 @@ describe('\'check-api-permission\' hook', () => {
     });
 
     app.service('dummy').hooks({
-      before: checkApiPermission()
+      //before: checkApiPermission()
     });
   });
 

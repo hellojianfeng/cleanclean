@@ -15,7 +15,7 @@ describe('\'before-add-org\' hook', () => {
     });
 
     app.service('dummy').hooks({
-      before: beforeAddOrg()
+      //before: beforeAddOrg()
     });
   });
 

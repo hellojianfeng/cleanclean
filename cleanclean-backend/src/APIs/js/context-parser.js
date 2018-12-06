@@ -74,13 +74,13 @@ module.exports = async function (context,options={}, refresh=false) {
       context.params.user.current_org = {oid: operation.org_id,path:operation.org_path};
       context.params.user.follow_org = null;
       delete context.model_parser.current_org;
-      context.model_parser.current_org = await getCurrentOrg;
+      context.model_parser.current_org = await getCurrentOrg();
       await userService.patch(context.params.user._id, { current_org: context.params.user.current_org, follow_org: null});
     }
     if(operation && operation.path === 'org-follow'){
       context.params.user.follow_org = {oid: operation.org_id,path:operation.org_path};
       delete context.model_parser.follow_org;
-      context.model_parser.follow_org = await getFollowOrg;
+      context.model_parser.follow_org = await getFollowOrg();
       await userService.patch(context.params.user._id, { follow_org: context.params.user.follow_org});
     }
     return operation;
@@ -90,7 +90,7 @@ module.exports = async function (context,options={}, refresh=false) {
     if(context.model_parser.current_operation_org && !refresh){
       return context.model_parser.current_operation_org;
     }
-    const operation = getCurrentOperation;
+    const operation = await getCurrentOperation();
     if(operation && operation.org_id){
       return context.model_parser.current_operation_org = await operationService.get(operation.org_id);
     }
@@ -190,7 +190,7 @@ module.exports = async function (context,options={}, refresh=false) {
 
   const getEveryoneRoleOperations = async ( org = null ) => {
     const role = await getEveryoneRole( org );
-    const permissions = await getEveryoneRolePermissions();
+    const permissions = await getEveryoneRolePermissions( org );
 
     const idList = role.operations.map ( o => {
       return o.oid;
@@ -394,7 +394,7 @@ module.exports = async function (context,options={}, refresh=false) {
 
   const getOrgUserFollowPermissions = async ( org = null ) => {
     const operation_org = await getCurrentOperationOrg();
-    org = org || await getCurrentOrg();
+    org = org || operation_org || await getCurrentOrg();
     const userRoles = await getOrgUserRoles( org );
     const urList = userRoles.map ( ur => {
       return ur.path;
@@ -537,14 +537,14 @@ module.exports = async function (context,options={}, refresh=false) {
     if(refresh){
       delete context.model_parser.org;
     }
-    context.model_parser.org = org = context.model_parser.org ? context.model_parser.irg : await getOrg;
+    context.model_parser.org = org = context.model_parser.org ? context.model_parser.irg : await getOrg();
   }
 
   if (roleData){
     if(refresh){
       delete context.model_parser.role;
     }
-    context.model_parser.role = role = context.model_parser.role ? context.model_parser.role : await getRole;
+    context.model_parser.role = role = context.model_parser.role ? context.model_parser.role : await getRole();
   }
 
   if (rolesData){

@@ -8,7 +8,9 @@ module.exports = async function (context, options = {}) {
 
   //const user = context.params.user;
 
-  const { operation, current_org } = await contextParser(context,options);
+  const { current_operation, current_org } = await contextParser(context,options);
+
+  const operation = current_operation;
 
   if (!operation || !operation._id){
     throw new Error('please provide operation id!');
