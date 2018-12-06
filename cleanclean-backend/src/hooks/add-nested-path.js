@@ -31,12 +31,13 @@ module.exports = function (seprator = '.') {
       }
       if(!data.path){
         data.path = data.name;
-      } else {
-        const lastName = data.path.split(seprator).pop();
-        if (lastName !== data.name){
-          data.path = data.path.replace(lastName,data.name);
-        }
-      }
+      } 
+      // else {
+      //   const lastName = data.path.split(seprator).pop();
+      //   if (lastName !== data.name){
+      //     data.path = data.path.replace(lastName,data.name);
+      //   }
+      // }
       context.data = data;
     }
 
