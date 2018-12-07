@@ -54,8 +54,10 @@ module.exports = async function (context, options = {}) {
       }
       let permission;
       if(typeof p === 'string'){
-        const models = await contextParser(context, { permission: { path: p, org: org }});
-        permission = models.permission;
+        //const models = await contextParser(context, { permission: { path: p, org: org }});
+        const parser = await contextParser(context);
+        permission = await parser.f.getPermission({ path: p, org: org });
+        //permission = models.permission;
       }
       if (typeof p === 'object' && p._id && p.path){
         permission = p;
