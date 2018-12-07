@@ -13,10 +13,10 @@ module.exports = async function (context,options={}, refresh=false) {
 
   const roleData = options.role || context.data && context.data.data && context.data.data.role;
   const rolesData = options.roles || context.data && context.data.data && context.data.data.roles || [];
-  const permissionData = options.role || context.data && context.data.data && context.data.data.permission;
-  const permissionsData = options.roles || context.data && context.data.data && context.data.data.permissions || [];
-  const operationData = options.role || context.data && context.data.data && context.data.data.operation;
-  const operationsData = options.roles || context.data && context.data.data && context.data.data.operations || [];
+  const permissionData = options.permission || context.data && context.data.data && context.data.data.permission;
+  const permissionsData = options.permissions || context.data && context.data.data && context.data.data.permissions || [];
+  const operationData = options.operation || context.data && context.data.data && context.data.data.operation;
+  const operationsData = options.operations || context.data && context.data.data && context.data.data.operations || [];
   const orgData = options.org || context.data && context.data.data && context.data.data.org;
   const userData = options.user || context.data && context.data.data && context.data.data.user;
   const usersData = options.user || context.data && context.data.data && context.data.data.users || [];
@@ -25,7 +25,7 @@ module.exports = async function (context,options={}, refresh=false) {
   let user,users, org,role,roles,permission, permissions,operation, operations;
   let everyone_role, everyone_permission,current_operation,current_operation_org,current_org,follow_org;
 
-  const getOrg = async () => {
+  const getOrg = async ( orgData ) => {
     let orgPath;
     if ( typeof orgData === 'object'){
       if (orgData._id && orgData.path){
@@ -97,15 +97,15 @@ module.exports = async function (context,options={}, refresh=false) {
     return null;
   };
 
-  const getRole = async () => {
+  const getRole = async ( roleData ) => {
     return await getModel(roleData,roleService);
   };
 
-  const getRoles = async () => {
+  const getRoles = async ( rolesData ) => {
     return getModelList(rolesData,roleService);
   };
 
-  const getUser = async () => {
+  const getUser = async ( userData ) => {
     let email;
     if ( typeof userData === 'object'){
       if (userData._id && userData.path){
@@ -134,7 +134,7 @@ module.exports = async function (context,options={}, refresh=false) {
     }
   };
 
-  const getUsers = async () => {
+  const getUsers = async ( usersData ) => {
     const users = [];
     let user, email;
     for (const u of usersData){
@@ -249,7 +249,7 @@ module.exports = async function (context,options={}, refresh=false) {
   };
 
   const getModel = async (modelData, service) => {
-    let path;
+    let path, org;
     if ( typeof modelData === 'object'){
       if (modelData._id && modelData.path){
         return modelData;
@@ -259,6 +259,9 @@ module.exports = async function (context,options={}, refresh=false) {
       }
       if(modelData.path && typeof modelData.path === 'string'){
         path = modelData.path;
+      }
+      if (modelData.org){
+        org = await getOrg(modelData.org);
       }
     }
 
@@ -270,7 +273,7 @@ module.exports = async function (context,options={}, refresh=false) {
     }
 
     if (path){
-      const org = await getCurrentOperationOrg() || await getCurrentOrg();
+      org = org || await getCurrentOperationOrg() || await getCurrentOrg();
       if (org && org._id){
         const finds = await service.find({query:{path:path, org_id:org._id}});
         if (finds.total === 1){
@@ -318,19 +321,19 @@ module.exports = async function (context,options={}, refresh=false) {
     return list;
   }; 
 
-  const getPermission = async () => {
+  const getPermission = async ( permissionData ) => {
     return await getModel(permissionData, permissionService);
   };
 
-  const getPermissions = async () => {
+  const getPermissions = async ( permissionsData ) => {
     return await getModelList(permissionsData,permissionService);
   };
 
-  const getOperation = async () => {
+  const getOperation = async ( operationData ) => {
     return await getModel(operationData, operationService);
   };
 
-  const getOperations = async () => {
+  const getOperations = async ( operationsData ) => {
     return await getModelList(operationsData,operationService);
   };
 
@@ -496,7 +499,7 @@ module.exports = async function (context,options={}, refresh=false) {
     return finds.data;
   }
 
-  const tools = {
+  const f = {
     getOrg, getRole, getRoles, getPermission, getPermissions, getOperation, getOperations, getUser, getUsers,
     getCurrentOrg, getCurrentOperation, getCurrentOperationOrg, getFollowOrg, 
     getEveryoneRole, getEveryonePermission, getEveryoneRolePermissions, getEveryoneRoleOperations, getEveryonePermissionOperations,
@@ -537,63 +540,63 @@ module.exports = async function (context,options={}, refresh=false) {
     if(refresh){
       delete context.model_parser.org;
     }
-    context.model_parser.org = org = context.model_parser.org ? context.model_parser.irg : await getOrg();
+    context.model_parser.org = org = context.model_parser.org ? context.model_parser.irg : await getOrg( orgData );
   }
 
   if (roleData){
     if(refresh){
       delete context.model_parser.role;
     }
-    context.model_parser.role = role = context.model_parser.role ? context.model_parser.role : await getRole();
+    context.model_parser.role = role = context.model_parser.role ? context.model_parser.role : await getRole( roleData );
   }
 
   if (rolesData){
     if(refresh){
       delete context.model_parser.roles;
     }
-    context.model_parser.roles = roles = context.model_parser.roles ? context.model_parser.roles : await getRoles();
+    context.model_parser.roles = roles = context.model_parser.roles ? context.model_parser.roles : await getRoles( rolesData);
   }
 
   if (permissionData){
     if(refresh){
       delete context.model_parser.permission;
     }
-    context.model_parser.permission = permission = context.model_parser.permission ? context.model_parser.permission : await getPermission();
+    context.model_parser.permission = permission = context.model_parser.permission ? context.model_parser.permission : await getPermission(permissionData);
   }
 
   if (permissionsData){
     if(refresh){
       delete context.model_parser.permissions;
     }
-    context.model_parser.permissions = permissions = context.model_parser.permissions ? context.model_parser.permissions : await getPermissions();
+    context.model_parser.permissions = permissions = context.model_parser.permissions ? context.model_parser.permissions : await getPermissions(permissionsData);
   }
 
   if (operationData){
     if(refresh){
       delete context.model_parser.operation;
     }
-    context.model_parser.operation = operation = context.model_parser.operation ? context.model_parser.operation : await getOperation();
+    context.model_parser.operation = operation = context.model_parser.operation ? context.model_parser.operation : await getOperation(operationData);
   }
 
   if (operationsData){
     if(refresh){
       delete context.model_parser.operations;
     }
-    context.model_parser.operations = operations = context.model_parser.operations ? context.model_parser.operations : await getOperations();
+    context.model_parser.operations = operations = context.model_parser.operations ? context.model_parser.operations : await getOperations(operationsData);
   }
 
   if (userData){
     if(refresh){
       delete context.model_parser.user;
     }
-    context.model_parser.user = user = context.model_parser.user ? context.model_parser.user : await getUser();
+    context.model_parser.user = user = context.model_parser.user ? context.model_parser.user : await getUser( userData );
   }
 
   if (usersData){
     if(refresh){
       delete context.model_parser.users;
     }
-    context.model_parser.users = users = context.model_parser.users ? context.model_parser.users : await getUsers();
+    context.model_parser.users = users = context.model_parser.users ? context.model_parser.users : await getUsers( usersData );
   }
 
   return { 
@@ -602,6 +605,6 @@ module.exports = async function (context,options={}, refresh=false) {
     everyone_permission, everyone_permission_operations, current_operation, current_operation_org, 
     current_org, operation_org_users,operation_org_roles, operation_org_permissions, operation_org_operations,
     follow_org, user_roles, user_permissions, user_operations, 
-    user_follow_permissions, user_follow_operations, tools
+    user_follow_permissions, user_follow_operations, f
   };
 };
