@@ -4,9 +4,6 @@ module.exports = async function (context, options = {}) {
   const contextParser = require('./context-parser');
 
   const runService = context.app.service('run-operation');
-  //const operationService = context.app.service('operations');
-
-  //const user = context.params.user;
 
   const { current_operation } = await contextParser(context,options);
 
@@ -20,7 +17,8 @@ module.exports = async function (context, options = {}) {
     operation: {
       _id: operation._id,
       path: operation.path
-    }
+    },
+    result: options
   };
 
   const findResult = await runService.find({
@@ -30,12 +28,8 @@ module.exports = async function (context, options = {}) {
       }
     }
   });
-  if (findResult.total === 1){
+  if (findResult.total > 0){
     result.isCalled = true;
-  }
-
-  if(context.data.action && context.data.action.toLowercase() === 'isuserallowed'){
-    //
   }
 
   return context.result = result;
