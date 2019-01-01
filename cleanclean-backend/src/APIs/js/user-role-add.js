@@ -38,7 +38,7 @@ module.exports = async function (context, options = {}) {
       ur.roles = [ { oid: everyone_role._id, path: everyone_role.path, org_id: everyone_role.org_id, org_path: everyone_role.path}];
     } else {
       const mRoles = user_roles.concat(ur.roles);
-      const uRoles = _.uniqBy(mRoles, e => { return e._id; });
+      const uRoles = _.uniqBy(mRoles, e => { return e.path; });
       ur.roles = uRoles.map ( r => {
         return {
           oid: r._id,
