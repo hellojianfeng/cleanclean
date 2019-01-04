@@ -2,20 +2,7 @@
 	"operation":"org-initialize",
 	"app":"default",
 	"data":{
-		"operations":{
-			"org-profile-management":{
-				"name":"org-profile-management",
-				"roles":["admin"]
-			},
-			"org-operation-management":{
-				"name":"org-operation-management",
-				"roles":["admin"]
-			},
-			"org-user-management":{
-				"name":"org-user-management",
-				"roles":["admin"]
-			}
-		},
+		"operations":{},
 		"permissions":{
 			"employee":{
 				"name":"employee",

@@ -286,7 +286,7 @@ module.exports = async function (context,options={}, refresh=false) {
  
   const getModelList = async (listData, service) => {
     const list = [];
-    let model, path;
+    let model, path, orgPath;
     const org = await getCurrentOperationOrg() || await getCurrentOrg();
     for (const e of listData){
       if (typeof e === 'object') {
@@ -300,6 +300,12 @@ module.exports = async function (context,options={}, refresh=false) {
         if(!e.oid && e.path){
           path = e.path;
         }
+        if(e.org && typeof e.org === 'string'){
+          orgPath = e.org
+        }
+        if(e.org_path && typeof e.org_path === 'string'){
+          orgPath = e.org_path
+        }
       }
       if(typeof e === 'string'){
         if(ObjectId.isValid(e)){
@@ -310,8 +316,9 @@ module.exports = async function (context,options={}, refresh=false) {
         }
       }
       if(path){
-        if (org && org._id){
-          const finds = await service.find({query:{path: path, org_id: org._id}});
+        orgPath = orgPath || org && org.path;
+        if (orgPath){
+          const finds = await service.find({query:{path: path, org_path: orgPath}});
           if (finds.total === 1){
             list.push(finds.data[0]);
           }
@@ -499,7 +506,7 @@ module.exports = async function (context,options={}, refresh=false) {
     return finds.data;
   };
 
-  const f = {
+  const js = {
     getOrg, getRole, getRoles, getPermission, getPermissions, getOperation, getOperations, getUser, getUsers,
     getCurrentOrg, getCurrentOperation, getCurrentOperationOrg, getFollowOrg, 
     getEveryoneRole, getEveryonePermission, getEveryoneRolePermissions, getEveryoneRoleOperations, getEveryonePermissionOperations,
@@ -605,6 +612,6 @@ module.exports = async function (context,options={}, refresh=false) {
     everyone_permission, everyone_permission_operations, current_operation, current_operation_org, 
     current_org, operation_org_users,operation_org_roles, operation_org_permissions, operation_org_operations,
     follow_org, user_roles, user_permissions, user_operations, 
-    user_follow_permissions, user_follow_operations, f
+    user_follow_permissions, user_follow_operations, js
   };
 };

@@ -41,8 +41,28 @@ module.exports = function (options = {}) {
         org_path: o.path
       });
       //add default org-follow operation
-      const orgUserManage = await operationService.create({
+      const orgUserAdmin = await operationService.create({
         name: 'org-user-admin',
+        org_id: o._id,
+        org_path: o.path
+      });
+      const orgRoleAdmin = await operationService.create({
+        name: 'org-role-admin',
+        org_id: o._id,
+        org_path: o.path
+      });
+      const orgPermissionAdmin = await operationService.create({
+        name: 'org-permission-admin',
+        org_id: o._id,
+        org_path: o.path
+      });
+      const orgOperationAdmin = await operationService.create({
+        name: 'org-operation-admin',
+        org_id: o._id,
+        org_path: o.path
+      });
+      const orgProfileAdmin = await operationService.create({
+        name: 'org-profile-admin',
         org_id: o._id,
         org_path: o.path
       });
@@ -58,8 +78,24 @@ module.exports = function (options = {}) {
               path: orgInitialize.path
             },
             {
-              oid: orgUserManage._id,
-              path: orgUserManage.path
+              oid: orgUserAdmin._id,
+              path: orgUserAdmin.path
+            },
+            {
+              oid: orgRoleAdmin._id,
+              path: orgRoleAdmin.path
+            },
+            {
+              oid: orgPermissionAdmin._id,
+              path: orgPermissionAdmin.path
+            },
+            {
+              oid: orgOperationAdmin._id,
+              path: orgOperationAdmin.path
+            },
+            {
+              oid: orgProfileAdmin._id,
+              path: orgProfileAdmin.path
             }
           ]
         },

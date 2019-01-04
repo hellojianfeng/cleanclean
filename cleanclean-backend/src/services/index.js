@@ -7,6 +7,8 @@ const runOperation = require('./run-operation/run-operation.service.js');
 const permissions = require('./permissions/permissions.service.js');
 const runApi = require('./run-api/run-api.service.js');
 const pages = require('./pages/pages.service.js');
+const notifications = require('./notifications/notifications.service.js');
+const scopes = require('./scopes/scopes.service.js');
 // eslint-disable-next-line no-unused-vars
 module.exports = function (app) {
   app.configure(users);
@@ -18,4 +20,6 @@ module.exports = function (app) {
   app.configure(permissions);
   app.configure(runApi);
   app.configure(pages);
+  app.configure(notifications);
+  app.configure(scopes);
 };
