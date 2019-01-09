@@ -13,11 +13,13 @@ Basic format to access this operation(API) is same as all other operation:
   ```
 
 Possible post body for this operation(for different operation, post body is different):
+org input can be ignored, if ignore, use current_org (which is set when access org-home) 
 
   ```
     {
       "operation":"org-initialize",
-      "stage": "initialize",
+      "org": "id or path",
+      "action": "initialize",
       "data":{
         "operations":{....},
         "permissions":{....},
@@ -85,26 +87,26 @@ full examples for company type of org like below: (please note that must use obj
 	}
   ```
 
-Each operation include some stages, the format to specify stage in operation is like below
+Each operation include some actions, the format to specify stage in operation is like below
 
   ```
     {
       "operation":"org-initialize",
-      "stage":"start",
+      "action":"open",
       .....
     }
   ```
 
 org-initialize operation include below stages:
-1. start stage (default): this stage is default stage, in this stage, this operation return org initialize data according to org type and setting. 
+1. open action (default): this stage is default stage, in this stage, this operation return org initialize data according to org type and setting. 
 org initialize data is caught from serveral source, these source include org type, org setting which is added when create org and operation data. for example, when create org, add an role in data (please see create-org page api for input during create org), and org type is company.clean which also define same role, and meanwhile we input operation.data with same role name (please refer above section for operation body), then final operation data will be merged one follow path of : operation data role >> override >> org data role (which is input when create org) >> override >> company.clean type role >> override >> company type same role (input from operation data folder for type).
 
-Possible post body for this stage:(stage can be ignore for start, if not provide data, it also can get data recursively by above description).
+Possible post body for this action:(action can be ignore for open, if not provide data, it also can get data recursively by above description).
 
   ```
     {
       "operation":"org-initialize",
-      "stage":"initialize",
+      "action":"open",
       .....
     }
   ```
@@ -180,7 +182,7 @@ Possible response data like below:
       }
     ```
     
-2. initialize stage: this stage finally run initialize action and will create roles, operations and so on for org.
+2. initialize action: this action finally run initialize action and will create roles, operations and so on for org.
 
 Possible post body:
     ```
@@ -218,13 +220,14 @@ Getting up and running is as easy as 1, 2, 3.
     ```
       {
         "operation":"org-initialize",
-        "stage":"initialize",
+        "org":"id or path",
+        "action":"initialize",
         .....
       }
     ```
 3. find response data like below:
 
-    "start" stage:
+    "open" action:
       ```
       {
           "operations": {
@@ -294,14 +297,14 @@ Getting up and running is as easy as 1, 2, 3.
           }
       }
     ```
-  "initialize" stage:
+  "initialize" action:
     
     ```
       {
         "page": {
             "oid": "5bee7705cc4a3b48773ce5ee"
         },
-        "stage": "start",
+        "action": "initialize",
         "data": {
             "operations": {
                 "org-initialize": {

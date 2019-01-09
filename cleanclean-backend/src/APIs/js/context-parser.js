@@ -17,7 +17,7 @@ module.exports = async function (context,options={}, refresh=false) {
   const permissionsData = options.permissions || context.data && context.data.data && context.data.data.permissions || [];
   const operationData = options.operation || context.data && context.data.data && context.data.data.operation;
   const operationsData = options.operations || context.data && context.data.data && context.data.data.operations || [];
-  const orgData = options.org || context.data && context.data.data && context.data.data.org;
+  const orgData = options.org || context.data && context.data.org || context.data && context.data.data && context.data.data.org;
   const userData = options.user || context.data && context.data.data && context.data.data.user;
   const usersData = options.user || context.data && context.data.data && context.data.data.users || [];
   const currentOperationData = options.org || context.data && context.data.operation;
@@ -60,7 +60,7 @@ module.exports = async function (context,options={}, refresh=false) {
       if (ObjectId.isValid(currentOperationData)){
         operation = operationService.get(currentOperationData);
       } else {
-        let org = await getOrg() || await getFollowOrg() || await getCurrentOrg();
+        let org = await getOrg( orgData ) || await getFollowOrg() || await getCurrentOrg();
         if(org && org._id){
           context.model_parser.current_operation_org = org;
           const finds = await operationService.find({query:{path:currentOperationData,org_id: org._id, org_path: org.path}});
