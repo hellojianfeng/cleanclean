@@ -41,7 +41,7 @@ module.exports = async function (context,options={}, refresh=false) {
 
     if (typeof orgData === 'string'){
       if(orgData && ObjectId.isValid(orgData)){
-        return await orgService.get(orgData.oid);
+        return await orgService.get(orgData);
       }
       orgPath = orgData;
     }
