@@ -14,6 +14,15 @@
             "path1":{
                 "path": "path1"
             }
-        }
+        },
+        "allowNotifications": [
+            { 
+                "operation":"path1",
+                "org":"path"
+            },
+            {
+                "page":"page_name"
+            }
+        ]
     }
 }

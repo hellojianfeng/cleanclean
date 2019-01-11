@@ -9,6 +9,7 @@ const runApi = require('./run-api/run-api.service.js');
 const pages = require('./pages/pages.service.js');
 const notifications = require('./notifications/notifications.service.js');
 const scopes = require('./scopes/scopes.service.js');
+const channels = require('./channels/channels.service.js');
 // eslint-disable-next-line no-unused-vars
 module.exports = function (app) {
   app.configure(users);
@@ -22,4 +23,5 @@ module.exports = function (app) {
   app.configure(pages);
   app.configure(notifications);
   app.configure(scopes);
+  app.configure(channels);
 };

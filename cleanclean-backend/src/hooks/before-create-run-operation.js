@@ -87,7 +87,25 @@ module.exports = function (options = {}) {
 
     const doOperation = require('../operations/js/'+ appName + '/' + current_operation.path.toLowerCase());
 
-    return doOperation(context, Object.assign(options, { current_operation, operation: current_operation }));
+    await doOperation(context, Object.assign(options, { current_operation, operation: current_operation }));
+
+    const operation = context.params.operation;
+    const user = context.params.user;
+    const channelService = context.app.service("channels");
+
+    const finds = channelService.find({query:{
+      "to_scope.operation":operation.path,
+      $exist:{
+        "to_scope.users":false,
+        "to_scope.roles":false,
+        "to_scope.permissions":false
+      }}});
+
+    context.result.notifier = {
+      listeners: finds.data
+    }
+
+    return context;
       
   };
 };

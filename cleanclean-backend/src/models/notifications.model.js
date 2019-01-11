@@ -6,22 +6,25 @@ module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const { Schema } = mongooseClient;
 
-  const messageSchema = new Schema({
+  const contentSchema = new Schema({
     name: { type: String },
     path: { type: String }, 
     tags: { type: String },
     description: { type: String },
-    contents: [{ type: String }],
+    header: { type: String },
+    body: { type: String, required: true },
+    contents: [ contentSchema ],
+    footer: { type: String },
     data: { type: Schema.Types.Mixed }
   });
+  
   const notifications = new Schema({
     name: { type: String },
     description: { type: String },
     path: { type: String, required: true },
-    messages: [ messageSchema ],
+    contents: [ contentSchema ],
     tags: { type: String },
-    to_scope: [ { type: Schema.Types.ObjectId } ],
-    from_scope: { type: Schema.Types.ObjectId, required: true },
+    channel: { type: Schema.Types.ObjectId },
     data: { type: Schema.Types.Mixed }
   }, {
     timestamps: true
